@@ -140,15 +140,25 @@ body {
 .ws-name{font-size:13px;font-weight:500;color:var(--text)}
 .ws-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:1px}
 
-/* energy dots */
-.edots{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px}
-.edot{
-  width:32px;height:32px;border-radius:50%;
-  border:1px solid var(--border);background:var(--cream2);
-  font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);
-  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;
+/* oura readiness input */
+.oura-row{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.oura-input{
+  width:90px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'Playfair Display',serif;font-size:22px;font-weight:700;
+  padding:8px 12px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none;
+  text-align:center;
 }
-.edot.sel{background:var(--green);border-color:var(--green2);color:#f0ebe0}
+.oura-input:focus{border-color:var(--green2)}
+.oura-badge{
+  flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text3);background:var(--cream2);transition:all .2s;min-height:44px;
+  display:flex;align-items:center;
+}
+.oura-badge.opt{background:var(--green-light);border-color:var(--green2);color:var(--green)}
+.oura-badge.good{background:#e8f0f5;border-color:#b8d0dc;color:#3a5a6a}
+.oura-badge.pay{background:#f8f2e0;border-color:#d4c090;color:#7a5a28}
+.oura-hint{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);margin-bottom:16px;letter-spacing:1px}
 
 /* env toggle */
 .env-row{display:flex;gap:8px;margin-bottom:16px}
@@ -402,6 +412,20 @@ body {
 .itag-r{background:#fdf0f0;color:var(--red);border-color:#d4b0b0}
 .itag-b{background:#e8f0f5;color:#3a5a6a;border-color:#b8d0dc}
 
+.ai-rec{
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.5px;
+  color:#f0ebe0;background:var(--green2);
+  padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0;
+  margin-left:auto;
+}
+.ai-rec{display:inline-block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;
+  padding:2px 7px;border-radius:3px;background:rgba(79,100,73,0.15);border:1px solid rgba(79,100,73,0.3);
+  color:var(--green2);margin-left:4px;white-space:nowrap;vertical-align:middle}
+.circuit-ai-rec{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
+  color:var(--green2);background:var(--green-light);border:1px solid #b8ccb4;
+  border-radius:6px;padding:6px 12px;margin-bottom:8px;display:none}
+.circuit-ai-rec.vis{display:block}
+
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:var(--cream2)}
 ::-webkit-scrollbar-thumb{background:var(--linen);border-radius:2px}
@@ -491,6 +515,7 @@ body {
     <div class="circuit-ex-body">
       <div class="circuit-ex-name" id="c-ex-name">Exercise</div>
       <div class="circuit-ex-detail" id="c-ex-detail">Detail</div>
+      <div class="circuit-ai-rec" id="c-ai-rec">&#10022; AI today: —</div>
       <div class="circuit-img-wrap">
         <img class="circuit-img" id="c-img" src="" alt="" onerror="this.style.display='none';document.getElementById('c-img-ph').style.display='flex'">
         <div class="circuit-img-ph" id="c-img-ph" style="display:none">Image coming soon</div>
@@ -573,14 +598,13 @@ body {
       </div>
     </div>
 
-    <div class="ai-section">Energy Today (1–10)</div>
-    <div class="edots">
-      <div class="edot" onclick="selEnergy(this,1)">1</div><div class="edot" onclick="selEnergy(this,2)">2</div>
-      <div class="edot" onclick="selEnergy(this,3)">3</div><div class="edot" onclick="selEnergy(this,4)">4</div>
-      <div class="edot" onclick="selEnergy(this,5)">5</div><div class="edot" onclick="selEnergy(this,6)">6</div>
-      <div class="edot sel" onclick="selEnergy(this,7)">7</div><div class="edot" onclick="selEnergy(this,8)">8</div>
-      <div class="edot" onclick="selEnergy(this,9)">9</div><div class="edot" onclick="selEnergy(this,10)">10</div>
+    <div class="ai-section">Oura Readiness Score</div>
+    <div class="oura-row">
+      <input type="number" id="oura-score" class="oura-input" min="0" max="100" placeholder="0–100"
+        oninput="updateOuraBadge(this.value)" onchange="selOura(this.value)">
+      <div class="oura-badge" id="oura-badge">—</div>
     </div>
+    <div class="oura-hint" id="oura-hint">Enter your score from the Oura app</div>
 
     <div class="ai-section">Environment</div>
     <div class="env-row">
@@ -645,6 +669,12 @@ body {
         <div class="day-card-arrow">→</div>
       </div>
     </div>
+  </div>
+
+  <!-- Download Progress — bottom of Plan tab -->
+  <div style="padding:0 16px 24px">
+    <button class="btn btn-outline" style="width:100%" onclick="downloadProgress()">⬇ Download All Progress</button>
+    <div style="font-family:'DM Mono',monospace;font-size:7px;color:var(--text3);text-align:center;margin-top:6px;letter-spacing:1px">Includes training logs · measurements · riding log · assessment</div>
   </div>
 </div><!-- /panel-plan -->
 
@@ -1011,23 +1041,26 @@ body {
       <div class="mbox"><div class="mbox-val" id="m-sessions">3</div><div class="mbox-label">Sessions</div></div>
       <div class="mbox"><div class="mbox-val" id="m-avgRPE">7</div><div class="mbox-label">Avg RPE</div></div>
       <div class="mbox"><div class="mbox-val" id="m-symptom">✓</div><div class="mbox-label">Last Symptom</div></div>
-      <div class="mbox"><div class="mbox-val" id="m-avgE">7</div><div class="mbox-label">Avg Energy</div></div>
+      <div class="mbox"><div class="mbox-val" id="m-avgE">7</div><div class="mbox-label">Avg Readiness</div></div>
     </div>
     <div class="form-card">
       <div class="form-title">Log a Session</div>
       <div class="frow">
         <div class="fgroup"><label class="flabel">Date</label><input type="date" class="finput" id="f-date"></div>
         <div class="fgroup"><label class="flabel">Workout</label>
-          <select class="fselect" id="f-workout">
-            <option>Day A — Upper Body (Gym)</option><option>Day A — Upper Body (Home)</option>
-            <option>Day B — Stability</option><option>Day C — Lower Body (Gym)</option>
-            <option>Day C — Lower Body (Home)</option><option>Rowing (standalone)</option>
-            <option>Riding Session</option><option>Rest / Active Recovery</option>
+          <select class="fselect" id="f-workout" onchange="updateLogFields()">
+            <option value="Day A — Upper Body (Gym)">Day A — Upper Body (Gym)</option>
+            <option value="Day A — Upper Body (Home)">Day A — Upper Body (Home)</option>
+            <option value="Day B — Stability">Day B — Stability</option>
+            <option value="Day C — Lower Body (Gym)">Day C — Lower Body (Gym)</option>
+            <option value="Day C — Lower Body (Home)">Day C — Lower Body (Home)</option>
+            <option value="Rowing (standalone)">Rowing (standalone)</option>
+            <option value="Rest / Active Recovery">Rest / Active Recovery</option>
           </select>
         </div>
       </div>
       <div class="frow3">
-        <div class="fgroup"><label class="flabel">Energy (1–10)</label><input type="number" class="finput" id="f-energy" min="1" max="10" placeholder="7"></div>
+        <div class="fgroup"><label class="flabel">Oura Readiness</label><input type="number" class="finput" id="f-energy" min="0" max="100" placeholder="0–100"></div>
         <div class="fgroup"><label class="flabel">RPE (1–10)</label><input type="number" class="finput" id="f-rpe" min="1" max="10" placeholder="6"></div>
         <div class="fgroup"><label class="flabel">Joint Symptoms</label>
           <select class="fselect" id="f-symptoms">
@@ -1035,20 +1068,31 @@ body {
           </select>
         </div>
       </div>
-      <div class="frow">
-        <div class="fgroup"><label class="flabel">Rowing — Distance / Time</label><input type="text" class="finput" id="f-row-dist" placeholder="e.g. 2000m in 9:40"></div>
-        <div class="fgroup"><label class="flabel">Rowing — Split (/500m)</label><input type="text" class="finput" id="f-row-split" placeholder="e.g. 2:41/500m"></div>
+
+      <!-- Dynamic weight/set fields — shown for Day A/B/C -->
+      <div id="f-sets-block" style="display:none">
+        <div class="flabel" style="margin-bottom:8px;margin-top:2px">Weights &amp; Reps (from AI recommendation)</div>
+        <div id="f-sets-rows"></div>
       </div>
-      <div class="frow">
-        <div class="fgroup"><label class="flabel">Treadmill — Duration</label><input type="text" class="finput" id="f-tm-dur" placeholder="e.g. 18 min / 1.2 mi"></div>
-        <div class="fgroup"><label class="flabel">Treadmill — Phase / Speeds</label><input type="text" class="finput" id="f-tm-detail" placeholder="Phase 2: 3.5/5.5mph"></div>
+
+      <!-- Rowing fields — shown when Day A / B / C (gym) or Rowing standalone -->
+      <div id="f-row-block">
+        <div class="frow">
+          <div class="fgroup"><label class="flabel">Rowing — Distance / Time</label><input type="text" class="finput" id="f-row-dist" placeholder="e.g. 2000m in 9:40"></div>
+          <div class="fgroup"><label class="flabel">Rowing — Split (/500m)</label><input type="text" class="finput" id="f-row-split" placeholder="e.g. 2:41/500m"></div>
+        </div>
       </div>
-      <div class="fgroup"><label class="flabel">Weights &amp; Reps</label><input type="text" class="finput" id="f-sets" placeholder="e.g. Goblet 30lb×10, Row 20lb×8, Leg Press 85lb×12"></div>
+
+      <!-- Treadmill fields — shown for Day A / C gym -->
+      <div id="f-tm-block" style="display:none">
+        <div class="frow">
+          <div class="fgroup"><label class="flabel">Treadmill — Duration</label><input type="text" class="finput" id="f-tm-dur" placeholder="e.g. 18 min / 1.2 mi"></div>
+          <div class="fgroup"><label class="flabel">Treadmill — Phase / Speeds</label><input type="text" class="finput" id="f-tm-detail" placeholder="Phase 2: 3.5/5.5mph"></div>
+        </div>
+      </div>
+
       <div class="fgroup"><label class="flabel">Notes</label><input type="text" class="finput" id="f-notes" placeholder="e.g. BOSU balance improving, wrists solid..."></div>
-      <div class="btn-row">
-        <button class="btn btn-green" onclick="addLog()">Log Session</button>
-        <button class="btn btn-outline" onclick="downloadProgress()">⬇ Download Progress</button>
-      </div>
+      <button class="btn btn-green" onclick="addLog()">Log Session</button>
     </div>
     <div id="loglist"></div>
   </div>
@@ -1215,6 +1259,11 @@ body {
           <option value="tough">Tough — off day for me or the horse</option>
         </select>
       </div>
+      <div class="frow3" style="margin-top:4px">
+        <div class="fgroup"><label class="flabel">Active Calories</label><input type="number" class="finput" id="rl-calories" placeholder="kcal" min="0"></div>
+        <div class="fgroup"><label class="flabel">Duration (min)</label><input type="number" class="finput" id="rl-duration" placeholder="min" min="0"></div>
+        <div class="fgroup"><label class="flabel">Distance (mi)</label><input type="number" class="finput" id="rl-distance" placeholder="mi" step="0.1" min="0"></div>
+      </div>
       <button class="btn btn-green" style="margin-top:8px" onclick="addRideLog()">Log Lesson</button>
     </div>
 
@@ -1258,7 +1307,9 @@ body {
 <script>
 // STATE
 let selWorkoutVal='Day A — Upper Body',selEnergyVal=7,selEnvVal='gym',activeDetail=null;
-const SK_LOGS='eq_logs_v1',SK_MEAS='eq_measurements_v1',SK_ASSESS='eq_assessment',SK_APIKEY='eq_apikey';
+let aiPlan = {}; // keyed by exercise name → {weight, reps, sets, raw}
+const SK_LOGS='eq_logs_v1',SK_MEAS='eq_measurements_v1',SK_ASSESS='eq_assessment',SK_APIKEY='eq_apikey',SK_AIPLAN='eq_aiplan_v1';
+
 
 // API KEY
 function getApiKey(){return localStorage.getItem(SK_APIKEY)||'';}
@@ -1279,9 +1330,9 @@ function initApiKey(){
 
 // SEEDED LOG
 let logs=[
-  {date:'2025-05-09',workout:'Day 3 — Full Body (Gym)',energy:7,rpe:7,symptoms:'g',rowDist:'2000m ~10 min',rowSplit:'2:41/500m',tmDur:'',tmDetail:'',sets:'Romanian DL 20lb×8–10 (↑ next), Lat Pulldown 55lb×8, Lunges BW×8–10, Push-ups off bench×10, Suitcase Carry 25lb×40s',notes:'Rowing rate 3. Ready to go up on RDL.'},
-  {date:'2025-05-07',workout:'Day 2 — Upper Body (Gym)',energy:7,rpe:7,symptoms:'g',rowDist:'1914m in 10 min',rowSplit:'~2:36/500m',tmDur:'',tmDetail:'',sets:'DB Bench 2×10lb×8–10 (↑), Single-Arm Row 20lb×8–10, Shoulder Press 2×10lb×8–10, Bicep Curls 2×10lb×12–15, Plank-ups 10 each',notes:'Bench ready to go up. ⚠ Monitor wrist on plank-ups.'},
-  {date:'2025-05-05',workout:'Day 1 — Lower Body (Gym)',energy:7,rpe:7,symptoms:'g',rowDist:'1950m in 10 min',rowSplit:'~2:33/500m',tmDur:'',tmDetail:'',sets:'Goblet 30lb×8–10, Sumo DL 30lb×8–10, Leg Press 75–80lb×12 (↑ next), Split Squat 2×15lb×8–12',notes:'Leg press worked up 70→75→80. Ready to go up next session.'}
+  {date:'2025-05-09',workout:'Day 3 — Full Body (Gym)',oura:75,energy:7,rpe:7,symptoms:'g',rowDist:'2000m ~10 min',rowSplit:'2:41/500m',tmDur:'',tmDetail:'',sets:'Romanian DL 20lb×8–10 (↑ next), Lat Pulldown 55lb×8, Lunges BW×8–10, Push-ups off bench×10, Suitcase Carry 25lb×40s',notes:'Rowing rate 3. Ready to go up on RDL.'},
+  {date:'2025-05-07',workout:'Day 2 — Upper Body (Gym)',oura:76,energy:7,rpe:7,symptoms:'g',rowDist:'1914m in 10 min',rowSplit:'~2:36/500m',tmDur:'',tmDetail:'',sets:'DB Bench 2×10lb×8–10 (↑), Single-Arm Row 20lb×8–10, Shoulder Press 2×10lb×8–10, Bicep Curls 2×10lb×12–15, Plank-ups 10 each',notes:'Bench ready to go up. ⚠ Monitor wrist on plank-ups.'},
+  {date:'2025-05-05',workout:'Day 1 — Lower Body (Gym)',oura:74,energy:7,rpe:7,symptoms:'g',rowDist:'1950m in 10 min',rowSplit:'~2:33/500m',tmDur:'',tmDetail:'',sets:'Goblet 30lb×8–10, Sumo DL 30lb×8–10, Leg Press 75–80lb×12 (↑ next), Split Squat 2×15lb×8–12',notes:'Leg press worked up 70→75→80. Ready to go up next session.'}
 ];
 let measurements=[];
 
@@ -1301,6 +1352,7 @@ function openDetail(day){
   document.getElementById('detail-'+day).classList.add('on');
   activeDetail=day;
   document.getElementById('content').scrollTop=0;
+  updatePlanUI(); // inject any existing AI recs into this panel
 }
 function closeDetail(){
   document.querySelectorAll('.detail-panel').forEach(p=>p.classList.remove('on'));
@@ -1318,7 +1370,16 @@ function detailEnv(day,env){
 
 // AI CONTROLS
 function selWorkout(el,val){document.querySelectorAll('.ws-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');selWorkoutVal=val;}
-function selEnergy(el,val){document.querySelectorAll('.edot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');selEnergyVal=val;}
+function updateOuraBadge(v){
+  const badge=document.getElementById('oura-badge'),hint=document.getElementById('oura-hint');
+  const n=parseInt(v);
+  if(!v||isNaN(n)||n<0||n>100){badge.className='oura-badge';badge.textContent='—';hint.textContent='Enter your score from the Oura app';selEnergyVal=null;return;}
+  selEnergyVal=n;
+  if(n>=85){badge.className='oura-badge opt';badge.textContent='★ Optimal — ready for action';hint.textContent='85+ · Push weight, full load';}
+  else if(n>=70){badge.className='oura-badge good';badge.textContent='◆ Good — well recovered';hint.textContent='70–84 · Normal progression';}
+  else{badge.className='oura-badge pay';badge.textContent='⚠ Pay attention — not fully recovered';hint.textContent='Under 70 · Reduce intensity, mobility focus';}
+}
+function selOura(v){const n=parseInt(v);if(!isNaN(n)&&n>=0&&n<=100)selEnergyVal=n;}
 function selEnv(env){
   selEnvVal=env;
   document.getElementById('env-gym').className='env-opt'+(env==='gym'?' sel':'');
@@ -1348,60 +1409,289 @@ async function generatePlan(){
 
   const recent=logs.slice(0,6);
   const logSum=recent.length===0?'No sessions yet — first session.':
-    recent.map(l=>`${fmtDate(l.date)} | ${l.workout} | Energy ${l.energy}/10 | RPE ${l.rpe||'?'} | Symptoms: ${l.symptoms==='g'?'none':l.symptoms==='y'?'mild':'significant'} | Weights: ${l.sets||'none'} | Row: ${l.rowDist||'none'} @ ${l.rowSplit||'—'} | TM: ${l.tmDur||'none'}${l.tmDetail?' / '+l.tmDetail:''} | Notes: ${l.notes||'—'}`).join('\n');
+    recent.map(l=>`${fmtDate(l.date)} | ${l.workout} | ${l.oura!==undefined?'Oura Readiness '+l.oura:'Energy '+l.energy+'/10'} | RPE ${l.rpe||'?'} | Symptoms: ${l.symptoms==='g'?'none':l.symptoms==='y'?'mild':'significant'} | Weights: ${l.sets||'none'} | Row: ${l.rowDist||'none'} @ ${l.rowSplit||'—'} | TM: ${l.tmDur||'none'}${l.tmDetail?' / '+l.tmDetail:''} | Notes: ${l.notes||'—'}`).join('
+');
 
   let assess='';
   try{const s=JSON.parse(localStorage.getItem(SK_ASSESS)||'{}');if(s.data){const d=s.data;assess=`Assessment: Bench ${d.bench}, Row ${d['row-ex']}, Press ${d.press}, Lat ${d.lat}, Carry ${d.carry}, Goblet ${d.goblet}, Sumo ${d.sumo}, LP ${d.legpress}, Split ${d.split}, Adductor ${d.adduct}. Row 2k: ${d['row-2k']} @${d['row-spm']}SPM. TM: walk ${d['tm-walk']}mph / jog ${d['tm-jog']}mph / max ${d['tm-max']} / phase ${d['tm-phase']}. EDS: balance ${d.balance}, tibialis ${d.tib}, plank ${d.plank}, wrist ${d.wrist}/10.`;}}catch(e){}
 
-  const sys=`You are an expert fitness coach for equestrian athletes with hypermobile EDS (hEDS). Generate concise, specific workout recommendations for one session.
+  const readinessLabel=selEnergyVal===null?'Not entered':selEnergyVal>=85?'Optimal ('+selEnergyVal+')':selEnergyVal>=70?'Good ('+selEnergyVal+')':'Pay attention ('+selEnergyVal+')';
+
+  const sys=`You are an expert fitness coach for equestrian athletes with hypermobile EDS (hEDS). Generate specific workout recommendations for one session.
 
 EDS rules always: stability before strength; forearm planks only (no plank-ups); no full push-ups until 4+ weeks; split squats back foot flat only; no knee flexion past 90° in early training; rowing — don't force the catch past comfortable compression.
 
-Energy logic: 1–4 → 2 sets, same or lighter weight, mobility focus. 5–6 → 2–3 sets, hold weight. 7–8 → 3 sets, slight progression if last session clean. 9–10 → full load, push weight if form was solid.
+Oura readiness logic: Under 70 → 2 sets, same or lighter weight, mobility focus, no new PRs. 70–79 → 2–3 sets, hold weight, standard session. 80–84 → 3 sets, normal progression if last session clean. 85+ → full load, push weight if form was solid, prioritize strength gains.
 
 Treadmill: Phase 1 = walk only; Phase 2 = walk 2min/jog 1min; Phase 3 = walk 90s/jog 90s. Day B = incline walk only, never jog. Day C = consider dropping one phase due to leg fatigue.
 
-Output format (keep it clean and scannable):
-WARM-UP
-[bullet list with timing]
+Respond with ONLY a JSON object, no markdown, no prose, no backticks — just the raw JSON:
+{
+  "summary": "2-3 sentence overall recommendation based on readiness and history",
+  "exercises": [
+    {"name": "exact exercise name", "rec": "weight × sets × reps or duration", "cue": "one brief form cue"}
+  ],
+  "rowing": {"rec": "e.g. 2000m @ 2:38/500m", "note": "brief cue"},
+  "treadmill": {"rec": "phase + speeds + duration, or null if not applicable", "note": "brief cue"},
+  "eds_note": "one specific observation from their history"
+}
 
-[WORKOUT TYPE] — [GYM or HOME]
-[Exercise Name: weight × sets × reps — brief cue if needed]
+Use these exact exercise names: DB Bench Press, Single-Arm DB Row, DB Shoulder Press, Lat Pulldown, Face Pulls, Bicep Curls, Wrist Roller, Suitcase Carry, Wall Push-Ups, Doorframe Rows, Superman Hold, Seated Shoulder Taps, Towel Grip Rows, Tibialis Raises, Calf Raises, Single-Leg Balance, Lateral Band Walks, Clamshells, Dead Bug, Goblet Squat, DB Sumo Deadlift, Leg Press, Split Squat, Adductor Machine, Hamstring Curl, DB Romanian Deadlift, Bodyweight Squat, Sumo Squat, Hip Thrust, BOSU Lateral Step-Overs, Isometric Adductor Squeeze, Wall Sit, Forearm Plank, Pallof Press, Side-Lying Hip Abduction. Only include exercises relevant to the selected workout.`;
 
-ROWING
-[distance and split target]
+  const usr=`Today: ${selWorkoutVal} | Oura Readiness: ${readinessLabel} | Environment: ${selEnvVal==='gym'?'Full gym':'Home / BOSU'}
 
-TREADMILL
-[phase, speeds, duration — or skip if home day]
-
-EDS NOTE
-[one specific observation from their history]
-
-Give specific numbers for every exercise. Use their log history to suggest appropriate progressions.`;
-
-  const usr=`Today: ${selWorkoutVal} | Energy: ${selEnergyVal}/10 | Environment: ${selEnvVal==='gym'?'Full gym':'Home / BOSU (galley kitchen, BOSU ball, rower coming soon)'}
-
-${assess?'BASELINE:\n'+assess+'\n':''}RECENT SESSIONS (newest first):
+${assess?'BASELINE:
+'+assess+'
+':''}RECENT SESSIONS (newest first):
 ${logSum}`;
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:usr}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system:sys,messages:[{role:'user',content:usr}]})});
     if(!res.ok){const err=await res.json().catch(()=>({}));body.innerHTML=`<span style="color:#d09090">Error ${res.status}: ${err.error?.message||'Check your API key and try again.'}</span>`;btn.disabled=false;return;}
     const data=await res.json();
-    const text=data.content?.find(b=>b.type==='text')?.text||'Could not generate. Please try again.';
-    const fmt=text.replace(/^(WARM-UP|ROWING|TREADMILL|EDS NOTE|DAY [ABC].*|UPPER.*|LOWER.*|STABILITY.*)/gm,'<strong style="display:block;margin-top:14px;margin-bottom:4px;font-family:\'DM Mono\',monospace;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(240,235,224,0.5);padding-bottom:6px;border-bottom:1px solid rgba(240,235,224,0.08)">$1</strong>').replace(/\n/g,'<br>');
-    body.innerHTML=fmt;
+    const raw=(data.content?.find(b=>b.type==='text')?.text||'').trim();
+    let plan=null;
+    try{
+      // Strip markdown fences if present
+      const jsonStr=raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();
+      plan=JSON.parse(jsonStr);
+    }catch(e){
+      // Fallback to plain text display
+      body.innerHTML=raw.replace(/
+/g,'<br>');
+      btn.disabled=false;return;
+    }
+    // Store plan globally keyed by exercise name (lowercase for getAIRec lookup)
+    aiPlan={};
+    if(plan.exercises)plan.exercises.forEach(ex=>{
+      if(ex.name){
+        // Store both original case and lowercase; fmtRec expects {raw} format
+        const entry={rec:ex.rec||'',cue:ex.cue||'',raw:ex.rec||''};
+        aiPlan[ex.name]=entry;
+        aiPlan[ex.name.toLowerCase()]=entry;
+      }
+    });
+    if(plan.rowing&&plan.rowing.rec){
+      const re={rec:plan.rowing.rec,cue:plan.rowing.note||'',raw:plan.rowing.rec};
+      aiPlan['Rowing']=re;aiPlan['rowing']=re;aiPlan['rowing machine']=re;
+    }
+    if(plan.treadmill&&plan.treadmill.rec&&plan.treadmill.rec!=='null'){
+      const te={rec:plan.treadmill.rec,cue:plan.treadmill.note||'',raw:plan.treadmill.rec};
+      aiPlan['Treadmill']=te;aiPlan['treadmill']=te;
+    }
+    // Persist so it survives tab switches
+    try{localStorage.setItem(SK_AIPLAN,JSON.stringify(aiPlan));}catch(e){}
+    // Render formatted card
+    body.innerHTML=renderAIPlanHTML(plan);
+    // Push recs into detail panels and log form
+    updatePlanUI();
+    applyAIRecsToDetailPanels();
+    updateLogFields();
   }catch(e){body.innerHTML='<span style="color:#d09090">Connection error. Check your network and try again.</span>';}
   btn.disabled=false;
 }
 
+function renderAIPlanHTML(plan){
+  let html='';
+  if(plan.summary)html+=`<div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">${plan.summary}</div>`;
+  if(plan.exercises&&plan.exercises.length){
+    html+=`<div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:8px">Today's Exercises</div>`;
+    html+=plan.exercises.map(ex=>`<div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2);flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--text);flex:1;min-width:120px">${ex.name}</span>
+      <span class="ai-rec">${ex.rec}</span>
+      ${ex.cue?`<span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);width:100%;padding-left:2px">↳ ${ex.cue}</span>`:''}
+    </div>`).join('');
+  }
+  if(plan.rowing&&plan.rowing.rec){
+    html+=`<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:5px">Rowing</div>
+      <div style="font-size:12px;color:var(--text)">${plan.rowing.rec}</div>
+      ${plan.rowing.note?`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:3px">↳ ${plan.rowing.note}</div>`:''}
+    </div>`;
+  }
+  if(plan.treadmill&&plan.treadmill.rec&&plan.treadmill.rec!=='null'){
+    html+=`<div style="margin-top:10px">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:5px">Treadmill</div>
+      <div style="font-size:12px;color:var(--text)">${plan.treadmill.rec}</div>
+      ${plan.treadmill.note?`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:3px">↳ ${plan.treadmill.note}</div>`:''}
+    </div>`;
+  }
+  if(plan.eds_note){
+    html+=`<div style="margin-top:12px;padding:10px 12px;border-radius:6px;background:#fdf0f0;border:1px solid #d4b0b0">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#8a3a3a;margin-bottom:4px">EDS Note</div>
+      <div style="font-size:11px;color:#5a2a2a;line-height:1.6">${plan.eds_note}</div>
+    </div>`;
+  }
+  return html;
+}
+
+function applyAIRecsToDetailPanels(){
+  // Remove stale chips from previous generate
+  document.querySelectorAll('.ai-rec-chip').forEach(el=>el.remove());
+  // Inject chips into exercise list items
+  document.querySelectorAll('.exlist li').forEach(li=>{
+    const nameEl=li.querySelector('.ex-name');
+    if(!nameEl)return;
+    const raw=nameEl.childNodes[0]?.textContent?.trim()||nameEl.textContent.trim();
+    let match=aiPlan[raw];
+    if(!match){
+      const short=raw.split(' ').slice(0,2).join(' ').toLowerCase();
+      const key=Object.keys(aiPlan).find(k=>k.toLowerCase().startsWith(short)||short.startsWith(k.toLowerCase().split(' ').slice(0,2).join(' ')));
+      if(key)match=aiPlan[key];
+    }
+    if(match){
+      const chip=document.createElement('span');
+      chip.className='ai-rec ai-rec-chip';
+      chip.textContent='❖ '+match.rec;
+      if(match.cue)chip.title=match.cue;
+      nameEl.appendChild(chip);
+    }
+  });
+  // Inject into rowing/treadmill wblock metas
+  document.querySelectorAll('.wblock-head').forEach(head=>{
+    const title=head.querySelector('.wblock-title');
+    if(!title)return;
+    const t=title.textContent.toLowerCase();
+    let match=null;
+    if(t.includes('rowing')||t.includes('row —')||t.includes('row-'))match=aiPlan['Rowing'];
+    else if(t.includes('treadmill'))match=aiPlan['Treadmill'];
+    if(match){
+      const meta=head.querySelector('.wblock-meta');
+      if(meta&&!meta.querySelector('.ai-rec-chip')){
+        const chip=document.createElement('span');
+        chip.className='ai-rec ai-rec-chip';
+        chip.style.marginLeft='6px';
+        chip.textContent='❖ '+match.rec;
+        meta.appendChild(chip);
+      }
+    }
+  });
+}
+
+// Look up a rec from aiPlan by exercise name (fuzzy)
+function getAIRec(exName) {
+  if(!exName)return null;
+  const key=exName.toLowerCase();
+  if(aiPlan[key])return aiPlan[key];
+  // Try first two words
+  const short=key.split(' ').slice(0,2).join(' ');
+  const found=Object.keys(aiPlan).find(k=>k.toLowerCase().startsWith(short)||short.startsWith(k.toLowerCase().split(' ').slice(0,2).join(' ')));
+  return found?aiPlan[found]:null;
+}
+
+// Format a rec entry for display (JSON format uses .rec string directly)
+function fmtRec(entry) {
+  if(!entry)return null;
+  return entry.rec||entry.raw||null;
+}
+
+// alias for updatePlanUI — use applyAIRecsToDetailPanels as the single source
+function updatePlanUI(){applyAIRecsToDetailPanels();}
+
+
+
+
+// DYNAMIC LOG FIELDS
+const LOG_EXERCISES = {
+  'Day A — Upper Body (Gym)': ['DB Bench Press','Single-Arm DB Row','DB Shoulder Press','Lat Pulldown','Face Pulls','Bicep Curls','Wrist Roller','Suitcase Carry'],
+  'Day A — Upper Body (Home)': ['Wall Push-Ups','Doorframe Rows','Superman Hold','Seated Shoulder Taps','Towel Grip Rows','Suitcase Carry'],
+  'Day B — Stability': ['Tibialis Raises','Calf Raises','Single-Leg Balance','Lateral Band Walks','Clamshells','Dead Bug'],
+  'Day C — Lower Body (Gym)': ['Goblet Squat','DB Sumo Deadlift','Leg Press','Split Squat','Adductor Machine','Hamstring Curl','DB Romanian Deadlift'],
+  'Day C — Lower Body (Home)': ['Bodyweight Squat','Sumo Squat','Hip Thrust','Split Squat','BOSU Lateral Step-Overs','Isometric Adductor Squeeze','Wall Sit'],
+  'Rowing (standalone)': [],
+  'Rest / Active Recovery': []
+};
+
+const GYM_DAYS = ['Day A — Upper Body (Gym)','Day C — Lower Body (Gym)'];
+const ROW_DAYS = ['Day A — Upper Body (Gym)','Day A — Upper Body (Home)','Day B — Stability','Day C — Lower Body (Gym)','Day C — Lower Body (Home)','Rowing (standalone)'];
+const TM_DAYS = ['Day A — Upper Body (Gym)','Day C — Lower Body (Gym)'];
+
+function updateLogFields() {
+  const workout = document.getElementById('f-workout').value;
+  const exes = LOG_EXERCISES[workout] || [];
+  const setsBlock = document.getElementById('f-sets-block');
+  const setsRows = document.getElementById('f-sets-rows');
+  const rowBlock = document.getElementById('f-row-block');
+  const tmBlock = document.getElementById('f-tm-block');
+
+  // Show/hide rowing
+  if(rowBlock) rowBlock.style.display = ROW_DAYS.includes(workout) ? '' : 'none';
+  // Show/hide treadmill
+  if(tmBlock) tmBlock.style.display = TM_DAYS.includes(workout) ? '' : 'none';
+  // Show/hide sets block
+  if(exes.length) {
+    setsBlock.style.display = '';
+    // Build rows — 3 set inputs per exercise
+    setsRows.innerHTML = exes.map(ex => `
+      <div class="f-set-row" data-ex="${ex}" style="margin-bottom:10px">
+        <div class="flabel" style="margin-bottom:5px">${ex}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <input class="finput f-s1" type="text" placeholder="Set 1 — e.g. 25lb×10" style="font-size:12px;padding:8px 10px">
+          <input class="finput f-s2" type="text" placeholder="Set 2" style="font-size:12px;padding:8px 10px">
+          <input class="finput f-s3" type="text" placeholder="Set 3" style="font-size:12px;padding:8px 10px">
+        </div>
+      </div>`).join('');
+    // Try to pre-fill from last AI recommendation
+    fillFromAI(workout, exes);
+  } else {
+    setsBlock.style.display = 'none';
+    setsRows.innerHTML = '';
+  }
+}
+
+function fillFromAI(workout, exes) {
+  if (!Object.keys(aiPlan).length) return;
+  exes.forEach(ex => {
+    const rec = getAIRec(ex);
+    if (!rec) return;
+    const row = document.querySelector(`.f-set-row[data-ex="${ex}"]`);
+    if (!row) return;
+    const formatted = fmtRec(rec);
+    if (!formatted) return;
+    const s1 = row.querySelector('.f-s1');
+    const s2 = row.querySelector('.f-s2');
+    const s3 = row.querySelector('.f-s3');
+    if (s1) s1.placeholder = 'Set 1 — AI: ' + formatted;
+    if (s2) s2.placeholder = 'Set 2 — AI: ' + formatted;
+    if (s3) s3.placeholder = 'Set 3 — AI: ' + formatted;
+  });
+}
+
 // LOG
 function addLog(){
-  const date=document.getElementById('f-date').value,energy=document.getElementById('f-energy').value;
-  if(!date||!energy){alert('Please fill in date and energy level.');return;}
-  logs.unshift({date,workout:document.getElementById('f-workout').value,energy:parseInt(energy),rpe:parseInt(document.getElementById('f-rpe').value)||null,symptoms:document.getElementById('f-symptoms').value,rowDist:document.getElementById('f-row-dist').value,rowSplit:document.getElementById('f-row-split').value,tmDur:document.getElementById('f-tm-dur').value,tmDetail:document.getElementById('f-tm-detail').value,sets:document.getElementById('f-sets').value,notes:document.getElementById('f-notes').value});
+  const date=document.getElementById('f-date').value;
+  if(!date){alert('Please fill in a date.');return;}
+  // Collect dynamic set rows
+  const setRows=[];
+  document.querySelectorAll('.f-set-row').forEach(row=>{
+    const ex=row.dataset.ex,s1=row.querySelector('.f-s1')?.value,s2=row.querySelector('.f-s2')?.value,s3=row.querySelector('.f-s3')?.value;
+    if(s1||s2||s3)setRows.push({ex,s1:s1||'',s2:s2||'',s3:s3||''});
+  });
+  const setsText=setRows.map(r=>{const parts=[r.s1,r.s2,r.s3].filter(Boolean);return r.ex+(parts.length?': '+parts.join(' / '):'');}).join(' | ');
+  const ouraVal=parseInt(document.getElementById('f-energy').value)||null;
+  logs.unshift({
+    date,
+    workout:document.getElementById('f-workout').value,
+    oura:ouraVal,
+    energy:ouraVal||null,
+    rpe:parseInt(document.getElementById('f-rpe').value)||null,
+    symptoms:document.getElementById('f-symptoms').value,
+    rowDist:document.getElementById('f-row-dist')?.value||'',
+    rowSplit:document.getElementById('f-row-split')?.value||'',
+    tmDur:document.getElementById('f-tm-dur')?.value||'',
+    tmDetail:document.getElementById('f-tm-detail')?.value||'',
+    sets:setsText,
+    notes:document.getElementById('f-notes').value
+  });
   saveLogs();renderLogs();updateMetrics();
-  ['f-energy','f-rpe','f-row-dist','f-row-split','f-tm-dur','f-tm-detail','f-sets','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-energy').value='';
+  document.getElementById('f-rpe').value='';
+  document.getElementById('f-notes').value='';
+  const rd=document.getElementById('f-row-dist');if(rd)rd.value='';
+  const rs=document.getElementById('f-row-split');if(rs)rs.value='';
+  const td=document.getElementById('f-tm-dur');if(td)td.value='';
+  const tdt=document.getElementById('f-tm-detail');if(tdt)tdt.value='';
+  document.querySelectorAll('.f-set-row input').forEach(i=>i.value='');
 }
 function renderLogs(){
   const c=document.getElementById('loglist');
@@ -1411,7 +1701,7 @@ function renderLogs(){
     <div class="logitem-date">${fmtDate(l.date)}</div>
     <div style="flex:1">
       <div class="logitem-title">${l.workout}</div>
-      <div class="logitem-detail">Energy ${l.energy}/10${l.rpe?` · RPE ${l.rpe}`:''}${l.rowDist?` · Row: ${l.rowDist}${l.rowSplit?' @ '+l.rowSplit:''}` :''}${l.tmDur?` · TM: ${l.tmDur}`:''}</div>
+      <div class="logitem-detail">${l.oura!=null?'Readiness '+l.oura:l.energy?'Energy '+l.energy+'/10':''}${l.rpe?` · RPE ${l.rpe}`:''}${l.rowDist?` · Row: ${l.rowDist}${l.rowSplit?' @ '+l.rowSplit:''}` :''}${l.tmDur?` · TM: ${l.tmDur}`:''}</div>
       ${l.sets?`<div class="logitem-sets">${l.sets}</div>`:''}
       ${l.notes?`<div class="logitem-detail" style="color:var(--text3);margin-top:2px">${l.notes}</div>`:''}
       <div class="itags"><span class="itag ${sC[l.symptoms]}">${sL[l.symptoms]}</span>${l.rpe?`<span class="itag itag-b">RPE ${l.rpe}</span>`:''}${l.rowDist?`<span class="itag itag-b">Row</span>`:''}${l.tmDur?`<span class="itag itag-b">TM</span>`:''}</div>
@@ -1419,7 +1709,7 @@ function renderLogs(){
 }
 function updateMetrics(){
   document.getElementById('m-sessions').textContent=logs.length;
-  document.getElementById('m-avgE').textContent=logs.length?Math.round(logs.reduce((s,l)=>s+l.energy,0)/logs.length):'—';
+  const ouraLogs=logs.filter(l=>l.oura!=null);document.getElementById('m-avgE').textContent=ouraLogs.length?Math.round(ouraLogs.reduce((s,l)=>s+l.oura,0)/ouraLogs.length)+'  avg':'—';
   const rArr=logs.filter(l=>l.rpe);
   document.getElementById('m-avgRPE').textContent=rArr.length?(rArr.reduce((s,l)=>s+l.rpe,0)/rArr.length).toFixed(1):'—';
   document.getElementById('m-symptom').textContent=logs[0]?({g:'✓',y:'~',r:'!'})[logs[0].symptoms]:'—';
@@ -1625,7 +1915,15 @@ function renderCircuitExercise() {
   const completedSteps = (round - 1) * total + exIdx;
   document.getElementById('c-progress-bar').style.width = (completedSteps / totalSteps * 100) + '%';
   document.getElementById('c-ex-name').textContent = ex.name;
-  document.getElementById('c-ex-detail').textContent = ex.detail;
+  const aiRec = getAIRec(ex.name);
+  const aiRecStr = fmtRec(aiRec);
+  const baseDetail = ex.detail;
+  if (aiRecStr) {
+    document.getElementById('c-ex-detail').innerHTML =
+      `<span style="color:#f0ebe0;background:var(--green2);padding:2px 8px;border-radius:10px;font-size:10px;letter-spacing:0.5px">✦ ${aiRecStr}</span>&nbsp;&nbsp;<span style="color:var(--text3)">${baseDetail}</span>`;
+  } else {
+    document.getElementById('c-ex-detail').textContent = baseDetail;
+  }
   // Form notes
   const notes = FORM_NOTES[ex.name];
   const notesEl = document.getElementById('c-form-notes');
@@ -1766,11 +2064,14 @@ function addRideLog() {
     feedback: document.getElementById('rl-feedback').value,
     body: document.getElementById('rl-body').value,
     feel: document.getElementById('rl-feel').value,
+    calories: parseInt(document.getElementById('rl-calories').value)||null,
+    duration: parseInt(document.getElementById('rl-duration').value)||null,
+    distance: parseFloat(document.getElementById('rl-distance').value)||null,
   };
   rideLogs.unshift(entry);
   try { localStorage.setItem(SK_RIDES, JSON.stringify(rideLogs)); } catch(e) {}
   renderRideLogs();
-  ['rl-horse','rl-instructor','rl-worked','rl-good','rl-improve','rl-feedback','rl-body'].forEach(id => document.getElementById(id).value = '');
+  ['rl-horse','rl-instructor','rl-worked','rl-good','rl-improve','rl-feedback','rl-body','rl-calories','rl-duration','rl-distance'].forEach(id => { const el=document.getElementById(id); if(el)el.value=''; });
 }
 
 function renderRideLogs() {
@@ -1790,6 +2091,7 @@ function renderRideLogs() {
       ${r.improve?`<div class="logitem-detail"><strong>Needs work:</strong> ${r.improve}</div>`:''}
       ${r.feedback?`<div class="logitem-detail" style="font-style:italic;color:var(--text3)">"${r.feedback}"</div>`:''}
       ${r.body?`<div class="logitem-detail" style="color:var(--green2)">Body: ${r.body}</div>`:''}
+      ${(r.calories||r.duration||r.distance)?`<div class="logitem-detail" style="color:var(--text3);margin-top:2px">${[r.duration?r.duration+' min':null, r.distance?r.distance+' mi':null, r.calories?r.calories+' kcal':null].filter(Boolean).join(' · ')}</div>`:''}
       <div class="itags"><span class="itag" style="background:var(--green-light);color:${feelColor[r.feel]||'var(--text3)'};border-color:${feelColor[r.feel]||'var(--border)'}">${feelLabel[r.feel]||r.feel}</span></div>
     </div>`).join('');
 }
@@ -1845,6 +2147,11 @@ loadRideLogs();
 renderLogs();updateMetrics();renderMeasurements();updateCurrentMeasurements();
 renderRideLogs();renderRideFocus();
 initApiKey();
+updateLogFields();
+// Restore oura score from last log if available
+if(logs.length&&logs[0].oura){const oi=document.getElementById('oura-score');if(oi)oi.value='';}
+// Restore last AI plan and re-apply chips to detail panels
+try{const sp=JSON.parse(localStorage.getItem(SK_AIPLAN)||'null');if(sp&&Object.keys(sp).length){aiPlan=sp;setTimeout(()=>{updatePlanUI();applyAIRecsToDetailPanels();},100);}}catch(e){}
 
 if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}
 </script>
