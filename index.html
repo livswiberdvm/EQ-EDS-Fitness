@@ -1442,7 +1442,7 @@ Use these exact exercise names: DB Bench Press, Single-Arm DB Row, DB Shoulder P
 ${assess?'BASELINE:\n'+assess+'\n':''}RECENT SESSIONS (newest first):\n${logSum}`;
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system:sys,messages:[{role:'user',content:usr}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1200,system:sys,messages:[{role:'user',content:usr}]})});
     if(!res.ok){const err=await res.json().catch(()=>({}));body.innerHTML=`<span style="color:#d09090">Error ${res.status}: ${err.error?.message||'Check your API key and try again.'}</span>`;btn.disabled=false;return;}
     const data=await res.json();
     const raw=(data.content?.find(b=>b.type==='text')?.text||'').trim();
