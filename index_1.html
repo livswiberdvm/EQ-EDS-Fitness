@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EQ Fitness">
+<meta name="theme-color" content="#0a0a08">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Equestrian Fitness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf7f3;
+  --cream: #f5f1ea;
+  --cream2: #e8e0d4;
+  --linen: #ddd5c8;
+  --green: #3d4f3a;
+  --green2: #4f6449;
+  --green3: #6b8264;
+  --green-light: #eaeeea;
+  --text: #2a2520;
+  --text2: #5a5248;
+  --text3: #8a8278;
+  --border: #cdc5b8;
+  --border2: #ddd5c8;
+  --card-bg: #f0ebe2;
+  --card-bg2: #f5f1ea;
+  --red: #8a3a3a;
+  --red-bg: rgba(138,58,58,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+/* ── BACKGROUND ── */
+body {
+  font-family:'DM Sans',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding-bottom: env(safe-area-inset-bottom);
+  position: relative;
+}
+.bg-floral {
+  position: fixed;
+  inset: 0;
+  background: url('imgfloral.png') center/cover no-repeat;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: multiply;
+}
+
+/* ── APP SHELL ── */
+.app-shell{display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1}
+.content{flex:1;overflow-y:auto;overflow-x:hidden}
+.panel{display:none;padding-bottom:20px}
+.panel.on{display:block}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  background: var(--green);
+  border-top: 2px solid #2e3d2b;
+  display:flex;
+  padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+  position:sticky;bottom:0;z-index:100;
+}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:none;border:none;cursor:pointer;padding:6px 2px;transition:all 0.2s;
+}
+.bnav-icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;transition:transform 0.2s}
+.bnav-icon svg{width:20px;height:20px;stroke:rgba(240,235,224,0.4);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke 0.2s}
+.bnav-label{font-family:'DM Mono',monospace;font-size:6px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(240,235,224,0.4);transition:color 0.2s}
+.bnav-btn.on .bnav-icon svg{stroke:#f0ebe0}
+.bnav-btn.on .bnav-label{color:#f0ebe0}
+.bnav-btn.on .bnav-icon{transform:translateY(-1px)}
+
+/* ── SECTION LABEL ── */
+.slabel{
+  font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3.5px;text-transform:uppercase;
+  color:var(--text3);margin:24px 20px 10px;display:flex;align-items:center;gap:10px;
+}
+.slabel::after{content:'';flex:1;height:1px;background:var(--border)}
+.slabel:first-child{margin-top:0}
+
+/* ── HERO ── */
+.hero{
+  position:relative;overflow:hidden;min-height:220px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  background: var(--green);
+}
+.hero-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+  opacity:0.22;mix-blend-mode:luminosity;
+}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom, rgba(61,79,58,0.2) 0%, rgba(30,40,28,0.7) 100%)}
+.hero-body{position:relative;padding:24px 20px 20px}
+.hero-eye{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(240,235,224,0.5);margin-bottom:6px}
+.hero-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#f0ebe0;line-height:1.3}
+.hero-sub{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(240,235,224,0.65);margin-top:4px}
+.hero-badges{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
+.hbadge{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border:1px solid rgba(240,235,224,0.25);color:rgba(240,235,224,0.55);border-radius:2px}
+
+/* ── AI CARD ── */
+.ai-card{
+  margin:16px;
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:18px;
+  box-shadow: 0 2px 12px rgba(61,79,58,0.08);
+}
+.ai-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px}
+.ai-sub{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:16px}
+.ai-section{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+
+/* workout selector */
+.ws{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.ws-opt{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;
+  background:var(--cream2);border:1px solid var(--border);border-radius:8px;
+  cursor:pointer;transition:all 0.15s;
+}
+.ws-opt.sel{background:var(--green-light);border-color:var(--green2)}
+.ws-circle{
+  width:38px;height:38px;border-radius:50%;
+  background:var(--linen);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  flex-direction:column;line-height:1.1;transition:all 0.15s;
+}
+.ws-opt.sel .ws-circle{background:var(--green);border-color:var(--green2)}
+.ws-day{font-family:'DM Mono',monospace;font-size:6px;letter-spacing:1px;text-transform:uppercase;color:var(--text3)}
+.ws-letter{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text2)}
+.ws-opt.sel .ws-day,.ws-opt.sel .ws-letter{color:#f0ebe0}
+.ws-name{font-size:13px;font-weight:500;color:var(--text)}
+.ws-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:1px}
+
+/* oura readiness input */
+.oura-row{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.oura-input{
+  width:90px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'Playfair Display',serif;font-size:22px;font-weight:700;
+  padding:8px 12px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none;
+  text-align:center;
+}
+.oura-input:focus{border-color:var(--green2)}
+.oura-badge{
+  flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text3);background:var(--cream2);transition:all .2s;min-height:44px;
+  display:flex;align-items:center;
+}
+.oura-badge.opt{background:var(--green-light);border-color:var(--green2);color:var(--green)}
+.oura-badge.good{background:#e8f0f5;border-color:#b8d0dc;color:#3a5a6a}
+.oura-badge.pay{background:#f8f2e0;border-color:#d4c090;color:#7a5a28}
+.oura-hint{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);margin-bottom:16px;letter-spacing:1px}
+
+/* env toggle */
+.env-row{display:flex;gap:8px;margin-bottom:16px}
+.env-opt{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px;border:1px solid var(--border);border-radius:8px;
+  background:var(--cream2);cursor:pointer;transition:all 0.15s;
+  font-size:12px;font-weight:500;color:var(--text2);
+}
+.env-opt.sel{background:var(--green-light);border-color:var(--green2);color:var(--green)}
+.env-check{width:16px;height:16px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all 0.15s}
+.env-opt.sel .env-check{background:var(--green2);border-color:var(--green2);color:#f0ebe0}
+
+/* generate btn */
+.gen-btn{
+  width:100%;padding:13px;border-radius:8px;
+  background:var(--green);color:#f0ebe0;
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  border:1px solid var(--green2);cursor:pointer;transition:background 0.15s;
+}
+.gen-btn:hover{background:var(--green2)}
+.gen-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+/* AI output */
+.ai-output{margin-top:14px;display:none}
+.ai-output.vis{display:block}
+.ai-out-hdr{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.ai-out-body{font-size:12px;color:var(--text2);line-height:1.8;white-space:pre-wrap}
+.ai-loading{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:10px;font-family:'DM Mono',monospace}
+.dot{width:4px;height:4px;border-radius:50%;background:var(--text3);animation:pulse 1.2s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
+
+/* ── WEEKLY STRIP ── */
+.weekly-wrap{margin:0 16px 16px;background:var(--bg);border-radius:10px;}
+.weekly-img{
+  width:100%;border-radius:10px;display:block;
+  mix-blend-mode:multiply;object-fit:contain;
+}
+
+/* ── INFO NOTE ── */
+.plan-note{
+  margin:0 16px 16px;
+  background:var(--green-light);
+  border:1px solid #c0ccc0;
+  border-radius:8px;padding:10px 12px;
+  font-size:10px;color:var(--text2);line-height:1.6;
+  display:flex;gap:8px;align-items:flex-start;
+}
+.note-i{color:var(--green2);flex-shrink:0;margin-top:1px}
+
+/* ── DAY CARDS ── */
+.day-cards{display:flex;flex-direction:column;gap:10px;padding:0 16px 16px}
+.day-card{
+  border-radius:10px;overflow:hidden;cursor:pointer;
+  border:1px solid var(--border);background:var(--card-bg);
+  transition:transform 0.15s,box-shadow 0.15s;display:flex;flex-direction:column;
+}
+.day-card:active{transform:scale(0.98)}
+.day-card:hover{box-shadow:0 4px 16px rgba(61,79,58,0.12)}
+.day-card-header{background:var(--green);padding:10px 14px;}
+.day-card-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(240,235,224,0.85)}
+.day-card-img{
+  width:100%;aspect-ratio:3/2;object-fit:cover;object-position:center top;
+  display:block;mix-blend-mode:multiply;
+  background:var(--bg);
+}
+.day-card-body{padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-end}
+.day-card-desc{font-size:11px;color:var(--text2);line-height:1.5;flex:1}
+.day-card-arrow{font-size:16px;color:var(--text3);flex-shrink:0;margin-left:10px}
+
+/* ── DETAIL PANELS ── */
+.detail-panel{display:none}
+.detail-panel.on{display:block}
+.detail-back{
+  display:flex;align-items:center;gap:6px;padding:14px 16px;
+  cursor:pointer;color:var(--green2);font-family:'DM Mono',monospace;
+  font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+  background:var(--card-bg);
+  position:sticky;top:0;z-index:10;
+}
+.detail-header{padding:16px;border-bottom:1px solid var(--border)}
+.detail-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text)}
+.detail-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:3px;letter-spacing:1px}
+
+/* workout image panels */
+.workout-img-wrap{margin:0;position:relative;overflow:hidden;max-height:400px}
+.workout-img{width:100%;display:block;mix-blend-mode:multiply;max-height:400px;object-fit:contain;object-position:center;}
+.workout-img-label{
+  position:absolute;top:10px;left:12px;
+  font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  color:#f0ebe0;background:rgba(61,79,58,0.85);padding:3px 8px;border-radius:3px;
+}
+
+/* env toggle in detail */
+.etb-row{display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.etb-btn{
+  flex:1;padding:7px;border-radius:6px;border:1px solid var(--border);
+  background:var(--cream2);font-family:'DM Mono',monospace;
+  font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);
+  cursor:pointer;text-align:center;transition:all 0.15s;
+}
+.etb-btn.on-gym,.etb-btn.on-home{background:var(--green-light);border-color:var(--green2);color:var(--green)}
+
+/* accordion blocks */
+.wblocks{padding:10px 16px 80px}
+.wblock{
+  background:var(--card-bg);border:1px solid var(--border);border-radius:8px;margin-bottom:7px;overflow:hidden;
+}
+.wblock-head{
+  display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+  border-left:2px solid var(--border);transition:background 0.15s;
+}
+.wblock-head.blue{border-left-color:#6a9fb8}
+.wblock-head.grn{border-left-color:var(--green2)}
+.wblock-head.brs{border-left-color:#b8923a}
+.wblock-head:active{background:var(--cream2)}
+.wblock-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text);flex:1}
+.wblock-meta{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3)}
+.wblock-arr{color:var(--text3);font-size:10px;transition:transform 0.2s}
+.wblock-body{padding:0 13px 11px;display:none;border-top:1px solid var(--border2)}
+.wblock-body.open{display:block}
+
+/* exercise list */
+.exlist{list-style:none;padding-top:4px}
+.exlist li{
+  display:flex;align-items:baseline;gap:6px;padding:5px 0;
+  border-bottom:1px solid var(--border2);font-size:11px;color:var(--text2);flex-wrap:wrap;line-height:1.4;
+}
+.exlist li:last-child{border-bottom:none}
+.ex-dot{color:var(--linen);flex-shrink:0;font-size:10px}
+.ex-name{flex:1;min-width:130px}
+.ex-sets{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);white-space:nowrap}
+.badge{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 5px;border-radius:2px;white-space:nowrap;flex-shrink:0}
+.b-gym{background:#e8f0f5;color:#3a5a6a;border:1px solid #b8d0dc}
+.b-home{background:var(--green-light);color:var(--green2);border:1px solid #b8ccb4}
+.b-both{background:#f5f0e8;color:#7a6040;border:1px solid #d4c8b0}
+.b-row{background:#f5f0e0;color:#7a5a28;border:1px solid #d4c090}
+
+/* notes */
+.note{margin-top:8px;padding:8px 10px;border-radius:6px;font-size:9px;line-height:1.65;display:flex;gap:7px;font-family:'DM Mono',monospace}
+.note.eds{background:#fdf0f0;border:1px solid #d4b0b0;color:#8a3a3a}
+.note.tip{background:var(--green-light);border:1px solid #b8ccb4;color:var(--green)}
+.note.info{background:#e8f0f5;border:1px solid #b8d0dc;color:#3a5a6a}
+.note.warn{background:#f8f2e0;border:1px solid #d4c090;color:#7a5a28}
+
+/* ── PAGE HEADERS ── */
+.page-header{background:var(--green);padding:22px 16px 18px;border-bottom:2px solid #2e3d2b}
+.page-eye{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(240,235,224,0.5);margin-bottom:4px}
+.page-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#f0ebe0}
+
+/* ── FORMS ── */
+.form-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.form-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:0}
+.fgroup{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.flabel{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);display:block}
+.finput,.fselect{
+  background:var(--cream2);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 12px;
+  outline:none;transition:border-color .15s;width:100%;display:block;
+  -webkit-appearance:none;appearance:none;min-height:44px;
+}
+.finput:focus,.fselect:focus{border-color:var(--green2)}
+.fselect{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8278' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.fselect option{background:var(--cream);color:var(--text)}
+.btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 20px;border-radius:6px;cursor:pointer;border:none;transition:all .15s}
+.btn-green{background:var(--green);color:#f0ebe0;border:1px solid var(--green2)}
+.btn-green:hover{background:var(--green2)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-row{display:flex;gap:8px;margin-top:4px}
+
+/* ── METRICS ── */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.mbox{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.mbox-val{font-family:'Playfair Display',serif;font-size:24px;color:var(--green);line-height:1;margin-bottom:2px}
+.mbox-label{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
+
+/* ── LOG ITEMS ── */
+.logitem{
+  background:var(--card-bg);border:1px solid var(--border);border-radius:8px;
+  padding:12px 14px;margin-bottom:6px;display:flex;gap:12px;
+  border-left:2px solid var(--linen);
+}
+.logitem.sym-g{border-left-color:var(--green2)}
+.logitem.sym-y{border-left-color:#b8923a}
+.logitem.sym-r{border-left-color:var(--red)}
+.logitem-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:1px;min-width:46px;padding-top:2px}
+.logitem-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.logitem-detail{font-family:'DM Mono',monospace;font-size:9px;color:var(--text2);line-height:1.6}
+.logitem-sets{font-family:'DM Mono',monospace;font-size:9px;color:rgba(150,200,150,0.8);margin-top:3px;line-height:1.5}
+.itags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.itag{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:2px;border:1px solid}
+.itag-g{background:rgba(80,140,80,0.1);color:#90c080;border-color:rgba(80,140,80,0.3)}
+.itag-y{background:rgba(200,160,60,0.1);color:#c0a060;border-color:rgba(200,160,60,0.25)}
+.itag-r{background:var(--red-bg);color:#d09090;border-color:rgba(192,64,64,0.3)}
+.itag-b{background:rgba(80,130,170,0.1);color:#88b8d8;border-color:rgba(80,130,170,0.25)}
+
+/* ── ASSESSMENT ── */
+.assess-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 16px}
+.assess-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:14px;border-top:2px solid var(--linen)}
+.assess-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px}
+.assess-list{list-style:none}
+.assess-list li{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border2);font-size:9px;color:var(--text2)}
+.assess-list li:last-child{border-bottom:none}
+.assess-input{font-family:'DM Mono',monospace;font-size:10px;background:var(--cream2);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:3px 7px;width:88px;text-align:right;outline:none}
+.assess-input:focus{border-color:var(--green2)}
+
+/* ── MEASUREMENTS ── */
+.measure-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.mhist-wrap{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.mhist-table{width:100%;border-collapse:collapse;font-size:9px}
+.mhist-table th{text-align:left;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border)}
+.mhist-table td{padding:7px 10px;border-bottom:1px solid var(--border2);color:var(--text2)}
+.mhist-table tr:last-child td{border-bottom:none}
+.delta-pos{color:var(--green2)}.delta-neg{color:var(--red)}
+
+/* ── MUSCLE GRID ── */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px}
+.mcard{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:14px;border-top:2px solid var(--linen)}
+.mcard.crit{border-top-color:var(--red)}.mcard.hi{border-top-color:#b8923a}.mcard.med{border-top-color:var(--green2)}
+.mcard-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.mcard-why{font-size:10px;color:var(--text2);margin-bottom:8px;line-height:1.5}
+.pbar-bg{background:var(--linen);border-radius:2px;height:2px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:2px}
+.mcard-pri{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-top:5px}
+
+/* ── GUIDE ── */
+.gcards{padding:0 16px 80px}
+.gcard{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:8px}
+.gcard-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.gcard-body{font-size:11px;color:var(--text2);line-height:1.75}
+.gcard-body ul{padding-left:14px}.gcard-body li{margin-bottom:4px}
+.rpe-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.rpe-box{background:var(--cream2);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.rpe-val{font-family:'Playfair Display',serif;font-size:18px;color:var(--green);line-height:1;margin-bottom:2px}
+.rpe-name{font-family:'DM Mono',monospace;font-size:7px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.rpe-desc{font-size:8px;color:var(--text3);line-height:1.4}
+
+/* log item text */
+.logitem-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);letter-spacing:1px;min-width:46px;padding-top:2px}
+.logitem-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.logitem-detail{font-family:'DM Mono',monospace;font-size:9px;color:var(--text2);line-height:1.6}
+.logitem-sets{font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);margin-top:3px;line-height:1.5}
+.itags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.itag{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:2px;border:1px solid}
+.itag-g{background:var(--green-light);color:var(--green2);border-color:#b8ccb4}
+.itag-y{background:#f8f2e0;color:#7a5a28;border-color:#d4c090}
+.itag-r{background:#fdf0f0;color:var(--red);border-color:#d4b0b0}
+.itag-b{background:#e8f0f5;color:#3a5a6a;border-color:#b8d0dc}
+
+.ai-rec{
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.5px;
+  color:#f0ebe0;background:var(--green2);
+  padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0;
+  margin-left:auto;
+}
+.ai-rec{display:inline-block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;
+  padding:2px 7px;border-radius:3px;background:rgba(79,100,73,0.15);border:1px solid rgba(79,100,73,0.3);
+  color:var(--green2);margin-left:4px;white-space:nowrap;vertical-align:middle}
+.circuit-ai-rec{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
+  color:var(--green2);background:var(--green-light);border:1px solid #b8ccb4;
+  border-radius:6px;padding:6px 12px;margin-bottom:8px;display:none}
+.circuit-ai-rec.vis{display:block}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--cream2)}
+::-webkit-scrollbar-thumb{background:var(--linen);border-radius:2px}
+
+/* exercise inline images — sized by aspect ratio */
+.ex-img{
+  width:100%;display:block;mix-blend-mode:multiply;
+  margin:6px 0 4px;border-radius:6px;
+  object-fit:contain;
+}
+/* tall portrait images get a taller slot so they're not squashed */
+.ex-img-tall{max-height:220px}
+/* normal landscape/square images */
+.ex-img-normal{max-height:160px}
+/* very wide landscape images */
+.ex-img-wide{max-height:120px}
+</style>
+</head>
+<body>
+<div class="bg-floral"></div>
+
+<style>
+/* CIRCUIT OVERLAY */
+.circuit-overlay{position:fixed;inset:0;z-index:1000;background:var(--bg);display:none;flex-direction:column}
+.circuit-overlay.active{display:flex}
+.circuit-topbar{background:var(--green);padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top));display:flex;align-items:center;gap:12px;flex-shrink:0}
+.circuit-close{background:none;border:none;color:rgba(240,235,224,0.7);font-size:22px;cursor:pointer;padding:0;line-height:1}
+.circuit-info{flex:1}
+.circuit-day-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(240,235,224,0.5)}
+.circuit-block-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#f0ebe0}
+.circuit-prog-wrap{background:rgba(255,255,255,0.15);border-radius:2px;height:3px;margin-top:8px;overflow:hidden}
+.circuit-prog-bar{height:100%;background:#f0ebe0;border-radius:2px;transition:width 0.3s}
+.circuit-counters{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--card-bg)}
+.circuit-ctr{flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--border)}
+.circuit-ctr:last-child{border-right:none}
+.circuit-ctr-val{font-family:'Playfair Display',serif;font-size:20px;color:var(--green);line-height:1}
+.circuit-ctr-lbl{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-top:2px}
+.circuit-ex-view{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.circuit-ex-body{flex:1;padding:14px 16px 0;display:flex;flex-direction:column}
+.circuit-ex-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.2}
+.circuit-ex-detail{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:1px;margin-bottom:10px}
+.circuit-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;max-height:46vh;margin-bottom:10px}
+.circuit-img{max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply}
+.circuit-img-ph{width:100%;height:160px;background:var(--cream2);border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+.circuit-bottom{padding:10px 16px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--card-bg);flex-shrink:0}
+.circuit-hint{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:8px}
+.circuit-next-btn{width:100%;padding:13px;border-radius:8px;background:var(--green);color:#f0ebe0;font-family:'Playfair Display',serif;font-style:italic;font-size:17px;font-weight:700;border:none;cursor:pointer}
+/* REST */
+.circuit-rest-view{flex:1;display:flex;align-items:center;justify-content:center}
+.circuit-rest-inner{display:flex;flex-direction:column;align-items:center;padding:24px;text-align:center}
+.circuit-rest-img{width:auto;height:160px;max-width:160px;object-fit:contain;mix-blend-mode:multiply;margin-bottom:14px}
+.circuit-rest-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--text);margin-bottom:4px}
+.circuit-rest-sub{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:18px}
+.circuit-timer{width:90px;height:90px;border-radius:50%;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;flex-direction:column;margin-bottom:16px}
+.circuit-timer-num{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--green);line-height:1}
+.circuit-timer-lbl{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
+.circuit-skip{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 20px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text3)}
+/* COMPLETE */
+.circuit-complete-view{flex:1;display:flex;align-items:center;justify-content:center}
+.circuit-complete-inner{display:flex;flex-direction:column;align-items:center;padding:24px;text-align:center}
+.circuit-ribbon{width:220px;height:auto;max-height:160px;object-fit:contain;mix-blend-mode:multiply;margin-bottom:18px}
+.circuit-complete-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:var(--text);margin-bottom:6px}
+.circuit-complete-sub{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--text2);margin-bottom:6px}
+.circuit-complete-det{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:24px}
+.circuit-done-btn{padding:14px 32px;border-radius:8px;background:var(--green);color:#f0ebe0;font-family:'Playfair Display',serif;font-style:italic;font-size:17px;font-weight:700;border:none;cursor:pointer}
+</style>
+
+<!-- ═══ CIRCUIT OVERLAY ═══ -->
+<div class="circuit-overlay" id="circuit-overlay">
+  <div class="circuit-topbar">
+    <button class="circuit-close" onclick="closeCircuit()">✕</button>
+    <div class="circuit-info">
+      <div class="circuit-day-lbl" id="c-day-label">Day A</div>
+      <div class="circuit-block-name" id="c-block-name">Warm-Up</div>
+      <div class="circuit-prog-wrap"><div class="circuit-prog-bar" id="c-progress-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="circuit-counters">
+    <div class="circuit-ctr"><div class="circuit-ctr-val" id="c-ex-num">1</div><div class="circuit-ctr-lbl">Exercise</div></div>
+    <div class="circuit-ctr"><div class="circuit-ctr-val" id="c-of-num">7</div><div class="circuit-ctr-lbl">of Total</div></div>
+    <div class="circuit-ctr"><div class="circuit-ctr-val" id="c-round-num">1</div><div class="circuit-ctr-lbl">Round</div></div>
+    <div class="circuit-ctr"><div class="circuit-ctr-val" id="c-rounds-total">1</div><div class="circuit-ctr-lbl">of Rounds</div></div>
+  </div>
+
+  <!-- Exercise view -->
+  <div class="circuit-ex-view" id="c-exercise-view">
+    <div class="circuit-ex-body">
+      <div class="circuit-ex-name" id="c-ex-name">Exercise</div>
+      <div class="circuit-ex-detail" id="c-ex-detail">Detail</div>
+      <div class="circuit-ai-rec" id="c-ai-rec">&#10022; AI today: —</div>
+      <div class="circuit-img-wrap">
+        <img class="circuit-img" id="c-img" src="" alt="" onerror="this.style.display='none';document.getElementById('c-img-ph').style.display='flex'">
+        <div class="circuit-img-ph" id="c-img-ph" style="display:none">Image coming soon</div>
+      </div>
+    </div>
+    <div class="circuit-bottom">
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button id="c-notes-toggle" onclick="toggleFormNotes()" style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:transparent;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);cursor:pointer">Form &amp; Anatomy Notes ↓</button>
+      </div>
+      <div id="c-form-notes" style="display:none;background:var(--green-light);border:1px solid #b8ccb4;border-radius:6px;padding:10px 12px;font-size:10px;color:var(--text2);line-height:1.65;margin-bottom:8px;font-family:'DM Sans',sans-serif;max-height:160px;overflow-y:auto"></div>
+      <div class="circuit-hint">Tap button when ready to move on</div>
+      <button class="circuit-next-btn" onclick="circuitNext()">Next →</button>
+    </div>
+  </div>
+
+  <!-- Rest view -->
+  <div class="circuit-rest-view" id="c-rest-view" style="display:none">
+    <div class="circuit-rest-inner">
+      <img class="circuit-rest-img" src="rest.png" alt="Rest" onerror="this.style.display='none'">
+      <div class="circuit-rest-title">Rest</div>
+      <div class="circuit-rest-sub" id="c-rest-sub">1 minute</div>
+      <div class="circuit-timer">
+        <div class="circuit-timer-num" id="c-timer-num">60</div>
+        <div class="circuit-timer-lbl">seconds</div>
+      </div>
+      <button class="circuit-skip" onclick="circuitNext()">Skip Rest →</button>
+    </div>
+  </div>
+
+  <!-- Complete view -->
+  <div class="circuit-complete-view" id="c-complete-view" style="display:none">
+    <div class="circuit-complete-inner">
+      <img class="circuit-ribbon" src="ribbon.png" alt="Complete!" onerror="this.style.display='none'">
+      <div class="circuit-complete-title">Well Ridden!</div>
+      <div class="circuit-complete-sub">Workout Complete</div>
+      <div class="circuit-complete-det" id="c-complete-detail">Day A · Upper Body</div>
+      <button class="circuit-done-btn" onclick="closeCircuit()">Back to Plan</button>
+    </div>
+  </div>
+</div>
+
+<div class="app-shell">
+<div class="content" id="content">
+
+<!-- ══════════ PLAN TAB ══════════ -->
+<div class="panel on" id="panel-plan">
+  <div class="hero">
+    <img class="hero-img" src="Screenshot_20260511_at_1_51_31AM.png" alt="">
+    <div class="hero-overlay"></div>
+    <div class="hero-body">
+      <div class="hero-eye">Equestrian Fitness System</div>
+      <div class="hero-title">EQUESTRIAN FITNESS SYSTEM</div>
+      <div class="hero-sub">Strength &amp; Wellness</div>
+      <div class="hero-badges">
+        <span class="hbadge">EDS-Aware</span>
+        <span class="hbadge">3 Days / Week</span>
+        <span class="hbadge">Gym + Home</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Card -->
+  <div class="ai-card">
+    <div class="ai-title">Today's Session Plan</div>
+    <div class="ai-sub">AI-generated recs from your log history</div>
+
+    <div class="ai-section">Today's Workout</div>
+    <div class="ws" id="ws">
+      <div class="ws-opt sel" onclick="selWorkout(this,'Day A — Upper Body')">
+        <div class="ws-circle"><span class="ws-day">Day</span><span class="ws-letter">A</span></div>
+        <div><div class="ws-name">Upper Body + Core</div><div class="ws-meta">Gym · 60–70 min</div></div>
+      </div>
+      <div class="ws-opt" onclick="selWorkout(this,'Day B — Stability')">
+        <div class="ws-circle"><span class="ws-day">Day</span><span class="ws-letter">B</span></div>
+        <div><div class="ws-name">Stability + Proprioception</div><div class="ws-meta">Either · 50 min</div></div>
+      </div>
+      <div class="ws-opt" onclick="selWorkout(this,'Day C — Lower Body')">
+        <div class="ws-circle"><span class="ws-day">Day</span><span class="ws-letter">C</span></div>
+        <div><div class="ws-name">Lower Body + Equestrian Power</div><div class="ws-meta">Gym · 60–70 min</div></div>
+      </div>
+    </div>
+
+    <div class="ai-section">Oura Readiness Score</div>
+    <div class="oura-row">
+      <input type="number" id="oura-score" class="oura-input" min="0" max="100" placeholder="0–100"
+        oninput="updateOuraBadge(this.value)" onchange="selOura(this.value)">
+      <div class="oura-badge" id="oura-badge">—</div>
+    </div>
+    <div class="oura-hint" id="oura-hint">Enter your score from the Oura app</div>
+
+    <div class="ai-section">Environment</div>
+    <div class="env-row">
+      <div class="env-opt sel" id="env-gym" onclick="selEnv('gym')"><div class="env-check">✓</div>Full Gym</div>
+      <div class="env-opt" id="env-home" onclick="selEnv('home')"><div class="env-check"></div>Home / BOSU</div>
+    </div>
+
+    <button class="gen-btn" id="gen-btn" onclick="generatePlan()">GENERATE ✦</button>
+
+    <!-- API Key input (stored in localStorage, never sent anywhere except Anthropic) -->
+    <div id="apikey-row" style="margin-top:10px">
+      <div style="font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:5px">Anthropic API Key <span style="font-size:6px;letter-spacing:1px;color:var(--text3);opacity:0.7">(saved locally on your device)</span></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false"
+          style="flex:1;background:var(--cream2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:8px 10px;outline:none;min-height:36px;">
+        <button onclick="saveApiKey()" style="padding:8px 12px;border-radius:6px;background:var(--green);color:#f0ebe0;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid var(--green2);cursor:pointer;white-space:nowrap;height:36px">Save</button>
+      </div>
+      <div id="apikey-msg" style="font-family:'DM Mono',monospace;font-size:8px;color:var(--green2);margin-top:4px;min-height:14px"></div>
+    </div>
+
+    <div class="ai-output" id="ai-output">
+      <div class="ai-out-hdr">Today's Recommendations</div>
+      <div class="ai-out-body" id="ai-out-body"></div>
+    </div>
+  </div>
+
+  <!-- Weekly Template -->
+  <div class="slabel" style="margin-top:20px">Weekly Template</div>
+  <div class="weekly-wrap">
+    <img class="weekly-img" src="imgweekly.png" alt="Weekly template">
+  </div>
+
+  <div class="plan-note">
+    <span class="note-i">ℹ</span>
+    <span>Never train 3 consecutive days. Riding counts as active recovery. Do not skip Day B — it is your most important EDS management session.</span>
+  </div>
+
+  <!-- Day Cards -->
+  <div class="slabel">Training Days</div>
+  <div class="day-cards">
+    <div class="day-card" onclick="openDetail('A')">
+      <div class="day-card-header"><div class="day-card-label">Day A — Upper Body + Core</div></div>
+      <img class="day-card-img" src="imgcarda.png" alt="Day A">
+      <div class="day-card-body">
+        <div class="day-card-desc">Build upper body strength and core stability to support riding posture and performance.</div>
+        <div class="day-card-arrow">→</div>
+      </div>
+    </div>
+    <div class="day-card" onclick="openDetail('B')">
+      <div class="day-card-header"><div class="day-card-label">Day B — Stability + Proprioception (EDS Priority Day)</div></div>
+      <img class="day-card-img" src="imgcardb.png" alt="Day B">
+      <div class="day-card-body">
+        <div class="day-card-desc">Strengthen joints, improve control and proprioception, reduce injury risk.</div>
+        <div class="day-card-arrow">→</div>
+      </div>
+    </div>
+    <div class="day-card" onclick="openDetail('C')">
+      <div class="day-card-header"><div class="day-card-label">Day C — Lower Body + Equestrian Power</div></div>
+      <img class="day-card-img" src="imgcardc.png" alt="Day C">
+      <div class="day-card-body">
+        <div class="day-card-desc">Develop lower body strength, power and riding endurance.</div>
+        <div class="day-card-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Progress — bottom of Plan tab -->
+  <div style="padding:0 16px 24px">
+    <button class="btn btn-outline" style="width:100%" onclick="downloadProgress()">⬇ Download All Progress</button>
+    <div style="font-family:'DM Mono',monospace;font-size:7px;color:var(--text3);text-align:center;margin-top:6px;letter-spacing:1px">Includes training logs · measurements · riding log · assessment</div>
+  </div>
+</div><!-- /panel-plan -->
+
+<!-- ══════════ DAY A DETAIL ══════════ -->
+<div class="detail-panel" id="detail-A">
+  <div class="detail-back" onclick="closeDetail()">← Back to Plan</div>
+  <div class="detail-header">
+    <div class="detail-title">Day A — Upper Body + Core</div>
+    <div class="detail-meta">60–70 min · RPE 6–7 · Monday</div>
+  </div>
+  <div class="etb-row">
+    <button class="etb-btn on-gym" id="dA-gym" onclick="detailEnv('A','gym')">Full Gym</button>
+    <button class="etb-btn" id="dA-home" onclick="detailEnv('A','home')">Home / BOSU</button>
+  </div>
+
+  <div class="wblocks">
+
+    <!-- Warm-up accordion -->
+    <div class="wblock">
+      <div class="wblock-head blue" onclick="toggle(this)"><div class="wblock-title">Joint Prep + Warm-Up</div><div class="wblock-meta">10–12 min</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body open">
+        <img class="wblock-img" src="imgdawarmup.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Wrist circles — slow, full ROM both directions</span><span class="ex-sets">90s each way</span></li>
+        <li><img src="wrist_circles.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Finger extensions — spread wide, hold 3s</span><span class="ex-sets">2×10</span></li>
+        <li><img src="finger_extensions.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Shoulder CARs — one arm, full controlled rotation</span><span class="ex-sets">5 each</span></li>
+        <li><img src="shoulder_cars.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Cat-Cow — inhale arch, exhale round</span><span class="ex-sets">8–10</span></li>
+        <li><img src="cat_cow.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Thoracic rotations — hands behind head, upper body only</span><span class="ex-sets">8 each side</span></li>
+        <li><img src="thoracic_rotations.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Dead bug — exhale on extension, low back pressed to floor</span><span class="ex-sets">2×6 each</span></li>
+        <li><img src="dead_bug.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-row">Row</span><span class="ex-name">Easy row — posture, arms and back focus</span><span class="ex-sets">5 min easy</span></li>
+        <li><img src="row.png" alt="" class="ex-img ex-img-wide"></li>
+        </ul>
+        <div class="note tip" style="margin-top:8px"><span>✦</span> EDS note: Wrist warm-up is not optional. Cold wrist tendons are far more vulnerable to micro-tears during loading. Take the full 90 seconds on circles.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('A','warmup')">Kick On ✦</button>
+      </div>
+    </div>
+
+    <!-- Gym block -->
+    <div class="wblock dA-gym-block">
+      <div class="wblock-head blue" onclick="toggle(this)"><div class="wblock-title">Upper Strength — Gym</div><div class="wblock-meta">35 min · RPE 6–7</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body">
+        <img class="wblock-img" src="imgdagym.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">DB Bench Press or Floor Press — elbows ~45°, 3s descent</span><span class="ex-sets">3×8–10</span></li>
+        <li><img src="bench_press.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Single-Arm DB Row — bench supported, pull to lower rib</span><span class="ex-sets">3×8–10 each</span></li>
+        <li><img src="dumbbell_row.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">DB Shoulder Press — seated, wrists straight</span><span class="ex-sets">3×8–10</span></li>
+        <li><img src="shoulder_press.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Lat Pulldown — medium overhand, pull to upper chest</span><span class="ex-sets">3×8</span></li>
+        <li><img src="lat_pulldown.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Face Pulls with rope — elbows high, pull to forehead</span><span class="ex-sets">3×12</span></li>
+        <li><img src="face_pulls.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Bicep Curls — elbows close, full ROM</span><span class="ex-sets">3×12–15</span></li>
+        <li><img src="bicep_curl.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Wrist roller or plate pinch — grip / EDS priority</span><span class="ex-sets">2×30s</span></li>
+        <li><img src="wrist_roller.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Suitcase Carry — heavy single DB, resist lean</span><span class="ex-sets">3×40s each</span></li>
+        <li><img src="suitcase_carry.png" alt="" class="ex-img ex-img-tall"></li>
+        </ul>
+        <div class="note eds"><span>⚠</span> Forearm plank only — no plank-ups. No full push-ups until wrist strength established (4+ weeks). On the bench press: rotate wrists slightly outward to align with your natural elbow carry angle.</div>
+        <div class="note tip" style="margin-top:6px"><span>✦</span> Shoulder press form tip: press in front of your head, never behind. Women's narrower biacromial width means behind-the-neck pressing strains the shoulder — especially with EDS laxity.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('A','gym-upper')">Kick On ✦</button>
+      </div>
+    </div>
+
+    <!-- Core finisher -->
+    <div class="wblock dA-gym-block">
+      <div class="wblock-head blue" onclick="toggle(this)"><div class="wblock-title">Core Finisher</div><div class="wblock-meta">10 min</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body">
+        <img class="wblock-img" src="imgdacore.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Forearm plank — no wrist loading</span><span class="ex-sets">3×20–30s</span></li>
+        <li><img src="forearm_plank.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Pallof press — cable anti-rotation</span><span class="ex-sets">3×10 each</span></li>
+        <li><img src="pallof_press.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Side-lying hip abduction — slow, glute med</span><span class="ex-sets">2×12 each</span></li>
+        <li><img src="hip_abduction_leg_raise.png" alt="" class="ex-img ex-img-wide"></li>
+        </ul>
+        <div class="note tip" style="margin-top:8px"><span>✦</span> Plank: 20s of perfect position beats 60s of sagging hips. EDS note — if your lumbar is hypermobile, actively posterior-tilt your pelvis before bracing. Ribs down, abs in, breathe steadily.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('A','core')">Kick On ✦</button>
+      </div>
+    </div>
+
+    <!-- Home block -->
+    <div class="wblock dA-home-block" style="display:none">
+      <div class="wblock-head grn" onclick="toggle(this)"><div class="wblock-title">Upper Strength — Home / BOSU</div><div class="wblock-meta">30 min · RPE 6–7</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body">
+        <img class="wblock-img" src="imgdahome.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-row">Row</span><span class="ex-name">Rowing machine — arms and back focus strokes</span><span class="ex-sets">5 min</span></li>
+        <li><img src="row.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Wall push-ups — wrist neutral, 3s descent</span><span class="ex-sets">3×10</span></li>
+        <li><img src="wall_push_up.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Doorframe rows — lean back, pull chest to door</span><span class="ex-sets">3×10</span></li>
+        <li><img src="doorframe_rows.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Superman hold — prone, lift chest and legs 3s</span><span class="ex-sets">3×8</span></li>
+        <li><img src="superman_hold.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">BOSU</span><span class="ex-name">BOSU dome-up seated shoulder taps</span><span class="ex-sets">3×8 each</span></li>
+        <li><img src="shoulder_taps.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Towel grip rows — loop around doorknob, lean and pull</span><span class="ex-sets">3×10</span></li>
+        <li><img src="towel_grip_rows.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Suitcase carry — gallon jug or heavy bag</span><span class="ex-sets">3×40s each</span></li>
+        <li><img src="suitcase_carry.png" alt="" class="ex-img ex-img-tall"></li>
+        </ul>
+        <div class="note tip"><span>✦</span> Wall push-up tip: turn hands 30–45° outward. Women have a wider elbow carry angle — this alignment is biomechanically correct and takes strain off the inner elbow. Quality over reps.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('A','home-upper')">Kick On ✦</button>
+      </div>
+    </div>
+
+    <div class="wblock dA-gym-block">
+      <div class="wblock-head blue" onclick="toggle(this)"><div class="wblock-title">Treadmill — Post-Weights</div><div class="wblock-meta">15–20 min</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body"><ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Phase 1</span><span class="ex-name">Walk — 3.0–3.5 mph flat (weeks 1–2)</span><span class="ex-sets">15 min</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Phase 2</span><span class="ex-name">Walk 2 min / jog 1 min — 3.5 / 5.0–5.5 mph (weeks 3–4)</span><span class="ex-sets">12 min</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Phase 3</span><span class="ex-name">Walk 90s / jog 90s — 3.5 / 5.5–6.0 mph (weeks 5–6+)</span><span class="ex-sets">15 min</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Cool</span><span class="ex-name">Walk — 2.5–3.0 mph flat</span><span class="ex-sets">3–5 min</span></li>
+      </ul>
+      <div class="note eds"><span>⚠</span> Midfoot strike, not heel strike. Drop phase if shin tightness or ankle wobble appears.</div>
+      <div class="note tip" style="margin-top:6px"><span>✦</span> Women have a wider Q-angle (hip to knee to foot alignment), which increases pronation risk on the treadmill. Be intentional about foot placement — center of the belt, hips square, arms swinging forward (not crossing the body).</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /detail-A -->
+
+<!-- ══════════ DAY B DETAIL ══════════ -->
+<div class="detail-panel" id="detail-B">
+  <div class="detail-back" onclick="closeDetail()">← Back to Plan</div>
+  <div class="detail-header">
+    <div class="detail-title">Day B — Stability + Proprioception</div>
+    <div class="detail-meta">50 min · RPE 5–6 · Wednesday · EDS Priority</div>
+  </div>
+  <div class="wblocks">
+    <div class="wblock">
+      <div class="wblock-head grn" onclick="toggle(this)"><div class="wblock-title">Warm-Up</div><div class="wblock-meta">8 min</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body open">
+        <img class="wblock-img" src="imgdbwarmup.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-row">Row</span><span class="ex-name">Easy row or 5 min walk — very light, joint warm only</span><span class="ex-sets">5 min easy</span></li>
+        <li><img src="row.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Seated ankle alphabet — slow, full ROM</span><span class="ex-sets">1× each foot</span></li>
+        <li><img src="ankle_alphabet.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">World's Greatest Stretch — lunge + thoracic rotation</span><span class="ex-sets">5 each side</span></li>
+        <li><img src="worlds_greatest_stretch.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Clamshells — activate glute med before standing work</span><span class="ex-sets">2×10 each</span></li>
+        <li><img src="clamshell.png" alt="" class="ex-img ex-img-wide"></li>
+        </ul>
+        <div class="note tip"><span>✦</span> Ankle alphabet is proprioception training, not just mobility. Move slowly and feel the joint in space — this re-educates the nervous system that EDS ankles need.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('B','warmup')">Kick On ✦</button>
+      </div>
+    </div>
+    <div class="wblock">
+      <div class="wblock-head grn" onclick="toggle(this)"><div class="wblock-title">Ankle + Shin Rehab</div><div class="wblock-meta">20 min · Slow, deliberate</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Tibialis anterior raises — back to wall, lift toes</span><span class="ex-sets">3×15</span></li>
+        <li><img src="tibialis_raise.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Calf raises — 3s eccentric descent</span><span class="ex-sets">3×12</span></li>
+        <li><img src="calf_raise.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Single-leg balance — flat ground; build to 30s</span><span class="ex-sets">3×20s each</span></li>
+        <li><img src="single_leg_balance.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">BOSU</span><span class="ex-name">Single-leg balance on BOSU dome-up — once flat is solid</span><span class="ex-sets">3×15s each</span></li>
+        <li><img src="single_leg_bosu_balance.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Lateral band walks — mini-band at ankles, stay low</span><span class="ex-sets">2×10 each way</span></li>
+        <li><img src="lateral_band_walks.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">BOSU</span><span class="ex-name">BOSU dome-up two-foot bounce and stick — hold 2s</span><span class="ex-sets">2×8</span></li>
+        <li><img src="bosu_bounce_and_stick.png" alt="" class="ex-img ex-img-tall"></li>
+        </ul>
+        <div class="note eds"><span>⚠</span> Tibialis anterior is overworking to compensate for ankle instability. Strengthen both together. Do not push through acute shin pain.</div>
+        <div class="note tip" style="margin-top:6px"><span>✦</span> The lateral band walk Q-angle tip: women's wider hip-to-knee alignment means knees want to cave inward during this exercise. Push knees out deliberately on every step — this corrects the biomechanics that create knee injury risk.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('B','ankle-rehab')">Kick On ✦</button>
+      </div>
+    </div>
+    <div class="wblock">
+      <div class="wblock-head grn" onclick="toggle(this)"><div class="wblock-title">Full-Body Stability Circuit</div><div class="wblock-meta">25 min</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body">
+        <img class="wblock-img" src="imgdbstability.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Glute bridge — double leg, 2s squeeze at top</span><span class="ex-sets">3×12</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Single-leg glute bridge — once double is easy</span><span class="ex-sets">3×8 each</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Bird-dog — 2s pause, no hip rotation</span><span class="ex-sets">3×8 each</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">BOSU</span><span class="ex-name">BOSU dome-up kneeling hold — hands free when able</span><span class="ex-sets">3×20s</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Step-ups onto BOSU flat-side-up or low step</span><span class="ex-sets">2×8 each</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Hip hinge — bodyweight or very light KB/DB</span><span class="ex-sets">3×10</span></li>
+        </ul>
+      <div class="note tip"><span>✦</span> Day B is your most important EDS session. Never skip or rush it.</div>
+      <div class="note eds" style="margin-top:6px"><span>⚠</span> Bird-dog EDS cue: do not let the pelvis rotate as you extend. If you feel your hip hiking or back arching, reduce your range of motion. Small and controlled beats big and sloppy every time.</div>
+      <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('B','stability')">Kick On ✦</button>
+      </div>
+    </div>
+    <div class="wblock">
+      <div class="wblock-head grn" onclick="toggle(this)"><div class="wblock-title">Treadmill — Incline Walk Only</div><div class="wblock-meta">15 min · No jogging on Day B</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body"><ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Walk</span><span class="ex-name">Incline walk — 3.0–3.5 mph at 4–6% incline</span><span class="ex-sets">10–12 min</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Cool</span><span class="ex-name">Flat walk — 2.5 mph, focus on midfoot strike</span><span class="ex-sets">3 min</span></li>
+      </ul>
+      <div class="note eds"><span>⚠</span> No jogging on Day B. Stabilizer muscles are fatigued. Save intervals for Days A and C.</div>
+      <div class="note tip" style="margin-top:6px"><span>✦</span> Incline walking activates glutes and posterior chain in a way flat walking doesn't. For riders: this is the closest treadmill substitute to the gluteal engagement pattern of posting trot.</div></div>
+    </div>
+  </div>
+</div><!-- /detail-B -->
+
+<!-- ══════════ DAY C DETAIL ══════════ -->
+<div class="detail-panel" id="detail-C">
+  <div class="detail-back" onclick="closeDetail()">← Back to Plan</div>
+  <div class="detail-header">
+    <div class="detail-title">Day C — Lower Body + Equestrian Power</div>
+    <div class="detail-meta">60–70 min · RPE 6–7 · Friday</div>
+  </div>
+  <div class="etb-row">
+    <button class="etb-btn on-gym" id="dC-gym" onclick="detailEnv('C','gym')">Full Gym</button>
+    <button class="etb-btn" id="dC-home" onclick="detailEnv('C','home')">Home / BOSU</button>
+  </div>
+  <div class="wblocks">
+    <div class="wblock">
+      <div class="wblock-head brs" onclick="toggle(this)"><div class="wblock-title">Warm-Up</div><div class="wblock-meta">10 min</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body open">
+        <img class="wblock-img" src="imgdcwarmup.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Ankle alphabet — seated, slow</span><span class="ex-sets">1× each</span></li>
+        <li><img src="ankle_alphabet.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Good morning to squat — hip hinge into squat</span><span class="ex-sets">8 reps</span></li>
+        <li><img src="good_morning_squat.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Clamshells — glute med activation before loading</span><span class="ex-sets">10 each</span></li>
+        <li><img src="clamshell.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-row">Row</span><span class="ex-name">Easy row — lower body warm</span><span class="ex-sets">5 min easy</span></li>
+        <li><img src="row.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Bodyweight squat — 3s down, pause, slow up</span><span class="ex-sets">2×8 warm-up</span></li>
+        <li><img src="bodyweight_squat.png" alt="" class="ex-img ex-img-tall"></li>
+        </ul>
+        <div class="note tip"><span>✦</span> Clamshells before any lower body loading wakes up glute med — the muscle that stabilizes your pelvis during squats and riding. If it's not firing, your knees and lower back do extra work.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('C','warmup')">Kick On ✦</button>
+      </div>
+    </div>
+    <div class="wblock dC-gym-block">
+      <div class="wblock-head brs" onclick="toggle(this)"><div class="wblock-title">Lower Body Strength — Gym</div><div class="wblock-meta">40 min · RPE 6–7</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body">
+        <img class="wblock-img" src="imgdcgym.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Goblet Squat — DB at chest, 3s eccentric</span><span class="ex-sets">3×8–10</span></li>
+        <li><img src="goblet_squat.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">DB Sumo Deadlift — wide stance, toes out, hinge not squat</span><span class="ex-sets">3×8–10</span></li>
+        <li><img src="sumo_dead_lift.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Leg Press — 90° max, no knee lockout</span><span class="ex-sets">3×12</span></li>
+        <li><img src="leg_press.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Split Squat — back foot flat on floor only</span><span class="ex-sets">3×8–10 each</span></li>
+        <li><img src="split_squat.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Adductor machine — slow; your saddle muscle</span><span class="ex-sets">3×12</span></li>
+        <li><img src="adductor_abductor.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Abductor machine — outer hip control</span><span class="ex-sets">3×12</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Hamstring curl — 3s eccentric</span><span class="ex-sets">3×10</span></li>
+        <li><img src="hamstring_curl.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">DB Romanian Deadlift — hinge focus, not load</span><span class="ex-sets">3×8–10</span></li>
+        <li><img src="romanian_deadlift.png" alt="" class="ex-img ex-img-tall"></li>
+        </ul>
+        <div class="note eds"><span>⚠</span> Split squats: back foot flat only. Max 90° knee flexion first 4–6 weeks.</div>
+        <div class="note tip" style="margin-top:6px"><span>✦</span> Sumo deadlift tip: wider stance suits women's wider hip structure naturally. Toes 30–45° out, weight through the heel, push knees outward to match toe direction. This is an adductor-dominant deadlift — perfect for riders.</div>
+        <div class="note tip" style="margin-top:6px"><span>✦</span> Adductor machine: this directly trains your grip on the horse. Think about squeezing at the posting trot — that's the muscle you're building. Keep the movement slow and deliberate, not bouncy.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('C','gym-lower')">Kick On ✦</button>
+      </div>
+    </div>
+    <div class="wblock dC-home-block" style="display:none">
+      <div class="wblock-head grn" onclick="toggle(this)"><div class="wblock-title">Lower Body — Home / BOSU</div><div class="wblock-meta">35 min · RPE 6–7</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body">
+        <img class="wblock-img" src="imgdchome.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-row">Row</span><span class="ex-name">Rowing — legs-only drill strokes</span><span class="ex-sets">5 min</span></li>
+        <li><img src="row.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Bodyweight squat — 3s eccentric, pause at bottom</span><span class="ex-sets">3×12</span></li>
+        <li><img src="bodyweight_squat.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">BOSU</span><span class="ex-name">BOSU flat-side-up squat</span><span class="ex-sets">3×8</span></li>
+        <li><img src="bosu_squat.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Sumo squat — inner thigh emphasis</span><span class="ex-sets">3×12</span></li>
+        <li><img src="sumo_squat.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Hip thrust off floor</span><span class="ex-sets">3×12</span></li>
+        <li><img src="hip_thrust.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Romanian deadlift — bodyweight or household item</span><span class="ex-sets">3×10</span></li>
+        <li><img src="romanian_deadlift.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Split squat — back foot flat, slow descent</span><span class="ex-sets">3×8 each</span></li>
+        <li><img src="split_squat.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">BOSU</span><span class="ex-name">BOSU lateral step-overs — hip abductor + balance</span><span class="ex-sets">2×8 each</span></li>
+        <li><img src="bosu_lateral_step_over.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Isometric adductor squeeze — pillow between knees</span><span class="ex-sets">3×20s</span></li>
+        <li><img src="isometric_adductor_squeeze.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-home">Home</span><span class="ex-name">Wall sit — use counter for balance</span><span class="ex-sets">3×30–45s</span></li>
+        <li><img src="wall_sit.png" alt="" class="ex-img ex-img-tall"></li>
+        </ul>
+        <div class="note tip"><span>✦</span> Isometric adductor squeeze is directly riding-specific. Squeeze slowly and progressively — don't yank the pillow. Think about the subtle squeeze you use to maintain position in the saddle, not the emergency clamp at a spook.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('C','home-lower')">Kick On ✦</button>
+      </div>
+    </div>
+    <div class="wblock dC-gym-block">
+      <div class="wblock-head brs" onclick="toggle(this)"><div class="wblock-title">Treadmill — Post-Weights</div><div class="wblock-meta">15–20 min</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body"><ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Phase 1</span><span class="ex-name">Walk — 3.0–3.5 mph (weeks 1–2)</span><span class="ex-sets">15 min</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Phase 2</span><span class="ex-name">Walk 2 min / jog 1 min (weeks 3–4)</span><span class="ex-sets">12 min</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Phase 3</span><span class="ex-name">Walk 90s / jog 90s (weeks 5–6+)</span><span class="ex-sets">15 min</span></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Cool</span><span class="ex-name">Walk — 2.5–3.0 mph flat</span><span class="ex-sets">3–5 min</span></li>
+      </ul>
+      <div class="note eds"><span>⚠</span> Legs already loaded — drop one phase if shin tightness or wobble appears.</div>
+      <div class="note tip" style="margin-top:6px"><span>✦</span> Day C treadmill is optional on hard leg days. If your knees feel wobbly or form is deteriorating, skip the jog intervals and walk only. Recovery is also training.</div></div>
+    </div>
+  </div>
+</div><!-- /detail-C -->
+
+<!-- ══════════ ASSESSMENT ══════════ -->
+<div class="panel" id="panel-assess">
+  <div class="page-header"><div class="page-eye">Setup</div><div class="page-title">Assessment Day</div></div>
+  <div style="padding:16px">
+    <div class="note warn" style="margin-bottom:14px;border-radius:8px"><span>★</span><span>Complete before your first training week. Light weight only — finding a starting point, not testing limits. Numbers here guide AI recommendations.</span></div>
+    <div class="note info" style="margin-bottom:16px;border-radius:8px"><span>ℹ</span><span>Stop each set at RPE 6–7 (2–3 reps in reserve). Rest 90s between sets.</span></div>
+    <div class="assess-grid">
+      <div class="assess-card"><div class="assess-title">Rowing</div><ul class="assess-list">
+        <li><span>500m easy time</span><input class="assess-input" type="text" placeholder="e.g. 3:20" id="a-row-warm"></li>
+        <li><span>2000m split (/500m)</span><input class="assess-input" type="text" placeholder="e.g. 2:41" id="a-row-2k"></li>
+        <li><span>Comfortable SPM</span><input class="assess-input" type="text" placeholder="e.g. 22" id="a-row-spm"></li>
+      </ul></div>
+      <div class="assess-card"><div class="assess-title">Treadmill</div><ul class="assess-list">
+        <li><span>Walk speed (mph)</span><input class="assess-input" type="text" placeholder="e.g. 3.2" id="a-tm-walk"></li>
+        <li><span>Jog speed (mph)</span><input class="assess-input" type="text" placeholder="e.g. 5.0" id="a-tm-jog"></li>
+        <li><span>Max jog before shins</span><input class="assess-input" type="text" placeholder="e.g. 90s" id="a-tm-max"></li>
+        <li><span>Current phase (1/2/3)</span><input class="assess-input" type="text" placeholder="1" id="a-tm-phase"></li>
+      </ul></div>
+      <div class="assess-card"><div class="assess-title">Upper Body</div><ul class="assess-list">
+        <li><span>DB Bench / Floor Press</span><input class="assess-input" type="text" placeholder="2×10lb" id="a-bench"></li>
+        <li><span>Single-Arm Row</span><input class="assess-input" type="text" placeholder="20lb" id="a-row-ex"></li>
+        <li><span>Shoulder Press</span><input class="assess-input" type="text" placeholder="2×10lb" id="a-press"></li>
+        <li><span>Lat Pulldown</span><input class="assess-input" type="text" placeholder="55lb" id="a-lat"></li>
+        <li><span>Suitcase Carry</span><input class="assess-input" type="text" placeholder="25lb" id="a-carry"></li>
+      </ul></div>
+      <div class="assess-card"><div class="assess-title">Lower Body</div><ul class="assess-list">
+        <li><span>Goblet Squat</span><input class="assess-input" type="text" placeholder="30lb" id="a-goblet"></li>
+        <li><span>Sumo Deadlift</span><input class="assess-input" type="text" placeholder="30lb" id="a-sumo"></li>
+        <li><span>Leg Press</span><input class="assess-input" type="text" placeholder="80lb" id="a-legpress"></li>
+        <li><span>Split Squat</span><input class="assess-input" type="text" placeholder="2×15lb" id="a-split"></li>
+        <li><span>Adductor machine</span><input class="assess-input" type="text" placeholder="30lb" id="a-adduct"></li>
+      </ul></div>
+      <div class="assess-card"><div class="assess-title">EDS Baseline</div><ul class="assess-list">
+        <li><span>Single-leg balance (s)</span><input class="assess-input" type="text" placeholder="e.g. 12s" id="a-balance"></li>
+        <li><span>Tibialis raises (reps)</span><input class="assess-input" type="text" placeholder="e.g. 8" id="a-tib"></li>
+        <li><span>Forearm plank hold</span><input class="assess-input" type="text" placeholder="e.g. 20s" id="a-plank"></li>
+        <li><span>Wrist discomfort (0–10)</span><input class="assess-input" type="text" placeholder="e.g. 2" id="a-wrist"></li>
+      </ul></div>
+    </div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-green" onclick="saveAssessment()">Save Assessment</button>
+      <button class="btn btn-outline" onclick="loadAssessment()">Load Saved</button>
+    </div>
+    <div id="assess-msg" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- ══════════ SESSION LOG ══════════ -->
+<div class="panel" id="panel-log">
+  <div class="page-header"><div class="page-eye">Track</div><div class="page-title">Session Log</div></div>
+  <div style="padding:16px">
+    <div class="metrics-row">
+      <div class="mbox"><div class="mbox-val" id="m-sessions">3</div><div class="mbox-label">Sessions</div></div>
+      <div class="mbox"><div class="mbox-val" id="m-avgRPE">7</div><div class="mbox-label">Avg RPE</div></div>
+      <div class="mbox"><div class="mbox-val" id="m-symptom">✓</div><div class="mbox-label">Last Symptom</div></div>
+      <div class="mbox"><div class="mbox-val" id="m-avgE">7</div><div class="mbox-label">Avg Readiness</div></div>
+    </div>
+    <div class="form-card">
+      <div class="form-title">Log a Session</div>
+      <div class="frow">
+        <div class="fgroup"><label class="flabel">Date</label><input type="date" class="finput" id="f-date"></div>
+        <div class="fgroup"><label class="flabel">Workout</label>
+          <select class="fselect" id="f-workout" onchange="updateLogFields()">
+            <option value="Day A — Upper Body (Gym)">Day A — Upper Body (Gym)</option>
+            <option value="Day A — Upper Body (Home)">Day A — Upper Body (Home)</option>
+            <option value="Day B — Stability">Day B — Stability</option>
+            <option value="Day C — Lower Body (Gym)">Day C — Lower Body (Gym)</option>
+            <option value="Day C — Lower Body (Home)">Day C — Lower Body (Home)</option>
+            <option value="Rowing (standalone)">Rowing (standalone)</option>
+            <option value="Rest / Active Recovery">Rest / Active Recovery</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow3">
+        <div class="fgroup"><label class="flabel">Oura Readiness</label><input type="number" class="finput" id="f-energy" min="0" max="100" placeholder="0–100"></div>
+        <div class="fgroup"><label class="flabel">RPE (1–10)</label><input type="number" class="finput" id="f-rpe" min="1" max="10" placeholder="6"></div>
+        <div class="fgroup"><label class="flabel">Joint Symptoms</label>
+          <select class="fselect" id="f-symptoms">
+            <option value="g">None — stable</option><option value="y">Mild — stiffness</option><option value="r">Significant</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dynamic weight/set fields — shown for Day A/B/C -->
+      <div id="f-sets-block" style="display:none">
+        <div class="flabel" style="margin-bottom:8px;margin-top:2px">Weights &amp; Reps (from AI recommendation)</div>
+        <div id="f-sets-rows"></div>
+      </div>
+
+      <!-- Rowing fields — shown when Day A / B / C (gym) or Rowing standalone -->
+      <div id="f-row-block">
+        <div class="frow">
+          <div class="fgroup"><label class="flabel">Rowing — Distance / Time</label><input type="text" class="finput" id="f-row-dist" placeholder="e.g. 2000m in 9:40"></div>
+          <div class="fgroup"><label class="flabel">Rowing — Split (/500m)</label><input type="text" class="finput" id="f-row-split" placeholder="e.g. 2:41/500m"></div>
+        </div>
+      </div>
+
+      <!-- Treadmill fields — shown for Day A / C gym -->
+      <div id="f-tm-block" style="display:none">
+        <div class="frow">
+          <div class="fgroup"><label class="flabel">Treadmill — Duration</label><input type="text" class="finput" id="f-tm-dur" placeholder="e.g. 18 min / 1.2 mi"></div>
+          <div class="fgroup"><label class="flabel">Treadmill — Phase / Speeds</label><input type="text" class="finput" id="f-tm-detail" placeholder="Phase 2: 3.5/5.5mph"></div>
+        </div>
+      </div>
+
+      <div class="fgroup"><label class="flabel">Notes</label><input type="text" class="finput" id="f-notes" placeholder="e.g. BOSU balance improving, wrists solid..."></div>
+      <button class="btn btn-green" onclick="addLog()">Log Session</button>
+    </div>
+    <div id="loglist"></div>
+  </div>
+</div>
+
+<!-- ══════════ MEASUREMENTS ══════════ -->
+<div class="panel" id="panel-measure">
+  <div class="page-header"><div class="page-eye">Track</div><div class="page-title">Measurements</div></div>
+  <div style="padding:16px">
+    <div class="measure-grid" id="measure-current">
+      <div class="mbox"><div class="mbox-val">—</div><div class="mbox-label">Waist (in)</div></div>
+      <div class="mbox"><div class="mbox-val">—</div><div class="mbox-label">Hips (in)</div></div>
+      <div class="mbox"><div class="mbox-val">—</div><div class="mbox-label">Thigh (in)</div></div>
+      <div class="mbox"><div class="mbox-val">—</div><div class="mbox-label">Arm (in)</div></div>
+    </div>
+    <div class="note warn" style="margin-bottom:14px;border-radius:8px"><span>★</span><span>Measure monthly, not weekly. EDS inflammation causes independent water retention fluctuations. Morning measurements are most consistent.</span></div>
+    <div class="form-card">
+      <div class="form-title">Add Monthly Measurement</div>
+      <div class="frow">
+        <div class="fgroup"><label class="flabel">Date</label><input type="date" class="finput" id="m-date"></div>
+        <div class="fgroup"><label class="flabel">Weight (lbs) — optional</label><input type="number" class="finput" id="m-weight" placeholder="optional"></div>
+      </div>
+      <div class="frow" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <div class="fgroup"><label class="flabel">Waist</label><input type="number" class="finput" id="m-waist" placeholder="in" step="0.5"></div>
+        <div class="fgroup"><label class="flabel">Hips</label><input type="number" class="finput" id="m-hips" placeholder="in" step="0.5"></div>
+        <div class="fgroup"><label class="flabel">Thigh</label><input type="number" class="finput" id="m-thigh" placeholder="in" step="0.5"></div>
+        <div class="fgroup"><label class="flabel">Arm</label><input type="number" class="finput" id="m-arm" placeholder="in" step="0.5"></div>
+      </div>
+      <div class="fgroup"><label class="flabel">How clothes fit</label>
+        <select class="fselect" id="m-fit"><option value="">—</option><option>Noticeably looser</option><option>Slightly looser</option><option>Same</option><option>Slightly tighter</option></select>
+      </div>
+      <div class="fgroup"><label class="flabel">Notes</label><input type="text" class="finput" id="m-notes" placeholder="e.g. feeling stronger in the saddle..."></div>
+      <button class="btn btn-green" onclick="addMeasurement()">Save</button>
+    </div>
+    <div class="slabel">History</div>
+    <div class="mhist-wrap">
+      <table class="mhist-table"><thead><tr><th>Date</th><th>Waist</th><th>Hips</th><th>Thigh</th><th>Arm</th><th>Weight</th><th>Fit</th></tr></thead>
+      <tbody id="m-hist-body"><tr><td colspan="7" style="color:var(--text3);padding:12px 10px">No measurements yet.</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MUSCLES ══════════ -->
+<div class="panel" id="panel-muscles">
+  <div class="page-header"><div class="page-eye">Reference</div><div class="page-title">Muscle Focus</div></div>
+  <div style="padding:16px 0 80px">
+    <div class="mgrid">
+      <div class="mcard crit"><div class="mcard-name">Adductors</div><div class="mcard-why">Grips saddle; controls leg position; essential at all gaits</div><div class="pbar-bg"><div class="pbar-fill" style="width:95%;background:rgba(200,160,80,0.6)"></div></div><div class="mcard-pri">★★★★★ Equestrian #1</div></div>
+      <div class="mcard crit"><div class="mcard-name">Glutes (Max + Med)</div><div class="mcard-why">Absorbs posting trot impact; anchors pelvis; stabilizes seat</div><div class="pbar-bg"><div class="pbar-fill" style="width:95%;background:rgba(200,160,80,0.6)"></div></div><div class="mcard-pri">★★★★★ Equestrian #1</div></div>
+      <div class="mcard crit"><div class="mcard-name">Ankle Stabilizers</div><div class="mcard-why">Prevents shin splints; controls heel-down; primary EDS injury site</div><div class="pbar-bg"><div class="pbar-fill" style="width:95%;background:rgba(192,64,64,0.7)"></div></div><div class="mcard-pri" style="color:rgba(200,120,120,0.9)">★★★★★ EDS Critical</div></div>
+      <div class="mcard crit"><div class="mcard-name">Wrist Stabilizers</div><div class="mcard-why">Supports rein contact; EDS wrist weakness creates progressive injury risk</div><div class="pbar-bg"><div class="pbar-fill" style="width:95%;background:rgba(192,64,64,0.7)"></div></div><div class="mcard-pri" style="color:rgba(200,120,120,0.9)">★★★★★ EDS Critical</div></div>
+      <div class="mcard crit"><div class="mcard-name">Deep Core (TVA)</div><div class="mcard-why">Controls spinal position; prevents back pain; supports hypermobile lumbar</div><div class="pbar-bg"><div class="pbar-fill" style="width:90%;background:rgba(200,160,80,0.6)"></div></div><div class="mcard-pri">★★★★★ Both</div></div>
+      <div class="mcard hi"><div class="mcard-name">Scapular Stabilizers</div><div class="mcard-why">Holds shoulders square; rowing builds this excellently; supports hypermobile shoulder</div><div class="pbar-bg"><div class="pbar-fill" style="width:80%;background:rgba(80,140,80,0.6)"></div></div><div class="mcard-pri">★★★★☆ EDS + Equestrian</div></div>
+      <div class="mcard hi"><div class="mcard-name">Hip Flexors</div><div class="mcard-why">Controls two-point; chronically shortened in riders — needs both length and strength</div><div class="pbar-bg"><div class="pbar-fill" style="width:75%;background:rgba(80,140,80,0.6)"></div></div><div class="mcard-pri">★★★★☆ Equestrian</div></div>
+      <div class="mcard med"><div class="mcard-name">Hamstrings</div><div class="mcard-why">Shock absorbs at sitting trot; supports posterior pelvic tilt for deep seat</div><div class="pbar-bg"><div class="pbar-fill" style="width:65%;background:rgba(80,120,80,0.5)"></div></div><div class="mcard-pri">★★★☆☆ Equestrian Support</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ EDS GUIDE ══════════ -->
+<div class="panel" id="panel-guide">
+  <div class="page-header"><div class="page-eye">Reference</div><div class="page-title">EDS Guide</div></div>
+  <div class="gcards" style="padding-top:16px">
+    <div class="gcard"><div class="gcard-title">Stability Before Strength — Always</div><div class="gcard-body">With hypermobile EDS, joint laxity means ligaments cannot reliably hold joints in place. Muscle strength and neuromuscular control must compensate. Master slow, controlled bodyweight versions before adding load. A sloppy rep at 5 lbs is more dangerous than a heavy lift with perfect form.</div></div>
+    <div class="gcard"><div class="gcard-title">Why Rowing is Ideal for EDS</div><div class="gcard-body">Rowing is low-impact and bilaterally symmetrical. It builds scapular stabilizers, grip endurance, and posterior chain simultaneously — directly addressing EDS weak points. Don't force the catch past comfortable knee compression. Drive powerfully but avoid hyperextending the knee at the finish.</div></div>
+    <div class="gcard"><div class="gcard-title">Anterior Shin Splints in EDS</div><div class="gcard-body">Tibialis anterior is overworking to compensate for ankle instability — doing two jobs at once. Strengthen both it AND the ankle stabilizers. Tibialis raises and peroneal work are your primary tools. Allow 4–6 weeks. Do not push through acute shin pain.</div></div>
+    <div class="gcard"><div class="gcard-title">Wrist Progression Protocol</div><div class="gcard-body"><ul><li>Start non-weight-bearing: circles, finger extensions, towel grip</li><li>Wall push-ups before floor push-ups</li><li>Fist push-ups on floor to keep wrist neutral if needed</li><li>Forearm plank only until wrist strength is established</li><li>No plank-ups yet — wrist transition under load is high-risk</li><li>Rowing is excellent for grip and wrist stability at moderate intensity</li></ul></div></div>
+    <div class="gcard"><div class="gcard-title">Red Flag Stop Signs</div><div class="gcard-body"><ul><li>Clunking, clicking, or giving-way in any joint</li><li>Sharp or burning joint pain (distinct from muscle burn)</li><li>Joint visibly or palpably shifting out of position</li><li>Numbness or tingling distal to a joint</li><li>Disproportionate pain after a session vs. normal DOMS</li></ul></div></div>
+    <div class="gcard"><div class="gcard-title">RPE Scale</div><div class="gcard-body">Stay RPE 6–7 for working sets. Joint protection matters more than training close to failure.
+      <div class="rpe-row">
+        <div class="rpe-box"><div class="rpe-val">4–5</div><div class="rpe-name">Warm-Up</div><div class="rpe-desc">Easy. Prep only.</div></div>
+        <div class="rpe-box"><div class="rpe-val">6–7</div><div class="rpe-name">Working</div><div class="rpe-desc">Your target. 2–3 reps in reserve.</div></div>
+        <div class="rpe-box"><div class="rpe-val">8–9</div><div class="rpe-name">Hard</div><div class="rpe-desc">Later, once base is built.</div></div>
+        <div class="rpe-box"><div class="rpe-val">10</div><div class="rpe-name">Max</div><div class="rpe-desc">Testing only.</div></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══ RIDING LOG ══ -->
+<div class="panel" id="panel-riding">
+  <div class="page-header"><div class="page-eye">Equestrian</div><div class="page-title">Riding Log</div></div>
+  <div style="padding:16px">
+
+    <!-- This Week's Focus -->
+    <div class="slabel" style="margin-top:0">This Week's Solo Ride Focus</div>
+    <div class="form-card" style="margin-bottom:0">
+      <div class="form-title">Working On This Week</div>
+      <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:10px;letter-spacing:1px">From your last lesson — bring this to your solo rides</div>
+      <div class="fgroup">
+        <label class="flabel">Focus Point 1</label>
+        <input type="text" class="finput" id="rf-focus1" placeholder="e.g. Sitting trot — keep hips following, not gripping">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">Focus Point 2</label>
+        <input type="text" class="finput" id="rf-focus2" placeholder="e.g. Outside rein contact — don't throw it away in corners">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">Focus Point 3</label>
+        <input type="text" class="finput" id="rf-focus3" placeholder="e.g. Heel position — weight into heel, not gripping with calf">
+      </div>
+      <div class="fgroup" style="margin-bottom:4px">
+        <label class="flabel">Instructor Note / Quote</label>
+        <input type="text" class="finput" id="rf-quote" placeholder="e.g. 'Ride the horse you have today, not the one you want'">
+      </div>
+      <button class="btn btn-green" style="margin-top:8px" onclick="saveRideFocus()">Save This Week's Focus</button>
+      <div id="rf-msg" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);margin-top:6px"></div>
+    </div>
+
+    <!-- Current focus display -->
+    <div id="ride-focus-display" style="display:none;margin-top:10px;background:var(--green-light);border:1px solid #b8ccb4;border-radius:8px;padding:14px 16px">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--green2);margin-bottom:8px">This Week's Focus</div>
+      <div id="ride-focus-list" style="font-size:12px;color:var(--text);line-height:1.8"></div>
+    </div>
+
+    <!-- Log a Lesson -->
+    <div class="slabel">Log a Lesson</div>
+    <div class="form-card">
+      <div class="form-title">Lesson Notes</div>
+      <div class="frow">
+        <div class="fgroup"><label class="flabel">Date</label><input type="date" class="finput" id="rl-date"></div>
+        <div class="fgroup"><label class="flabel">Lesson Type</label>
+          <select class="fselect" id="rl-type">
+            <option>Flat — dressage/eq focus</option>
+            <option>Flat — general</option>
+            <option>Jump lesson</option>
+            <option>Trail / hack</option>
+            <option>Solo ride</option>
+            <option>Schooling show</option>
+            <option>Competition</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label class="flabel">Horse</label><input type="text" class="finput" id="rl-horse" placeholder="e.g. Piper"></div>
+        <div class="fgroup"><label class="flabel">Instructor</label><input type="text" class="finput" id="rl-instructor" placeholder="e.g. Sarah"></div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">What We Worked On</label>
+        <input type="text" class="finput" id="rl-worked" placeholder="e.g. Leg yields, sitting trot, canter transitions">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">What Went Well</label>
+        <input type="text" class="finput" id="rl-good" placeholder="e.g. Really got the bend through the corner today">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">What Needs Work</label>
+        <input type="text" class="finput" id="rl-improve" placeholder="e.g. Still losing the outside rein in the downward transition">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">Instructor Feedback / Key Corrections</label>
+        <input type="text" class="finput" id="rl-feedback" placeholder="e.g. Shoulders back, stop death-gripping with knee">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">Body / EDS Notes</label>
+        <input type="text" class="finput" id="rl-body" placeholder="e.g. Left hip tight, wrists held up well, ankles stable">
+      </div>
+      <div class="fgroup" style="margin-bottom:4px">
+        <label class="flabel">Overall Feel</label>
+        <select class="fselect" id="rl-feel">
+          <option value="great">Great — felt connected and strong</option>
+          <option value="good">Good — solid session</option>
+          <option value="ok">OK — had moments but also struggles</option>
+          <option value="tough">Tough — off day for me or the horse</option>
+        </select>
+      </div>
+      <div class="frow3" style="margin-top:4px">
+        <div class="fgroup"><label class="flabel">Active Calories</label><input type="number" class="finput" id="rl-calories" placeholder="kcal" min="0"></div>
+        <div class="fgroup"><label class="flabel">Duration (min)</label><input type="number" class="finput" id="rl-duration" placeholder="min" min="0"></div>
+        <div class="fgroup"><label class="flabel">Distance (mi)</label><input type="number" class="finput" id="rl-distance" placeholder="mi" step="0.1" min="0"></div>
+      </div>
+      <button class="btn btn-green" style="margin-top:8px" onclick="addRideLog()">Log Lesson</button>
+    </div>
+
+    <!-- History -->
+    <div class="slabel">Lesson History</div>
+    <div id="ride-loglist"><div style="font-size:11px;color:var(--text3);padding:8px 0;font-family:'DM Mono',monospace">No lessons logged yet.</div></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bnav-btn on" onclick="navTab('plan',this)">
+    <div class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+    <div class="bnav-label">Plan</div>
+  </button>
+  <button class="bnav-btn" onclick="navTab('log',this)">
+    <div class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+    <div class="bnav-label">Log</div>
+  </button>
+  <button class="bnav-btn" onclick="navTab('riding',this)">
+    <div class="bnav-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="4" ry="3"/><path d="M6 8c-2 1-4 4-4 8h20c0-4-2-7-4-8"/><path d="M8 16v4M16 16v4"/></svg></div>
+    <div class="bnav-label">Riding</div>
+  </button>
+  <button class="bnav-btn" onclick="navTab('measure',this)">
+    <div class="bnav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    <div class="bnav-label">Measure</div>
+  </button>
+  <button class="bnav-btn" onclick="navTab('assess',this)">
+    <div class="bnav-icon"><svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 2H7a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V4a2 2 0 00-2-2h-2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
+    <div class="bnav-label">Assess</div>
+  </button>
+  <button class="bnav-btn" onclick="navTab('guide',this)">
+    <div class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+    <div class="bnav-label">EDS</div>
+  </button>
+</nav>
+</div>
+
+<script>
+// STATE
+let selWorkoutVal='Day A — Upper Body',selEnergyVal=7,selEnvVal='gym',activeDetail=null;
+let aiPlan = {}; // keyed by exercise name → {weight, reps, sets, raw}
+const SK_LOGS='eq_logs_v1',SK_MEAS='eq_measurements_v1',SK_ASSESS='eq_assessment',SK_APIKEY='eq_apikey',SK_AIPLAN='eq_aiplan_v1';
+
+
+// API KEY
+function getApiKey(){return localStorage.getItem(SK_APIKEY)||'';}
+function saveApiKey(){
+  const k=document.getElementById('api-key-input').value.trim();
+  if(!k){document.getElementById('apikey-msg').textContent='Enter your key first.';return;}
+  try{localStorage.setItem(SK_APIKEY,k);}catch(e){}
+  document.getElementById('apikey-msg').textContent='✓ Key saved on this device';
+  setTimeout(()=>{document.getElementById('apikey-msg').textContent='';},3000);
+}
+function initApiKey(){
+  const k=getApiKey();
+  if(k){
+    document.getElementById('api-key-input').value=k;
+    document.getElementById('apikey-msg').textContent='✓ Key saved';
+  }
+}
+
+// SEEDED LOG
+let logs=[
+  {date:'2025-05-09',workout:'Day 3 — Full Body (Gym)',oura:75,energy:7,rpe:7,symptoms:'g',rowDist:'2000m ~10 min',rowSplit:'2:41/500m',tmDur:'',tmDetail:'',sets:'Romanian DL 20lb×8–10 (↑ next), Lat Pulldown 55lb×8, Lunges BW×8–10, Push-ups off bench×10, Suitcase Carry 25lb×40s',notes:'Rowing rate 3. Ready to go up on RDL.'},
+  {date:'2025-05-07',workout:'Day 2 — Upper Body (Gym)',oura:76,energy:7,rpe:7,symptoms:'g',rowDist:'1914m in 10 min',rowSplit:'~2:36/500m',tmDur:'',tmDetail:'',sets:'DB Bench 2×10lb×8–10 (↑), Single-Arm Row 20lb×8–10, Shoulder Press 2×10lb×8–10, Bicep Curls 2×10lb×12–15, Plank-ups 10 each',notes:'Bench ready to go up. ⚠ Monitor wrist on plank-ups.'},
+  {date:'2025-05-05',workout:'Day 1 — Lower Body (Gym)',oura:74,energy:7,rpe:7,symptoms:'g',rowDist:'1950m in 10 min',rowSplit:'~2:33/500m',tmDur:'',tmDetail:'',sets:'Goblet 30lb×8–10, Sumo DL 30lb×8–10, Leg Press 75–80lb×12 (↑ next), Split Squat 2×15lb×8–12',notes:'Leg press worked up 70→75→80. Ready to go up next session.'}
+];
+let measurements=[];
+
+// NAV
+function navTab(id,el){
+  if(activeDetail)closeDetail();
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('panel-'+id).classList.add('on');
+  el.classList.add('on');
+  document.getElementById('content').scrollTop=0;
+}
+
+// DETAIL
+function openDetail(day){
+  document.querySelectorAll('.panel,.detail-panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('detail-'+day).classList.add('on');
+  activeDetail=day;
+  document.getElementById('content').scrollTop=0;
+  updatePlanUI(); // inject any existing AI recs into this panel
+}
+function closeDetail(){
+  document.querySelectorAll('.detail-panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('panel-plan').classList.add('on');
+  activeDetail=null;
+  document.getElementById('content').scrollTop=0;
+}
+function detailEnv(day,env){
+  document.querySelectorAll('.d'+day+'-gym-block').forEach(b=>{b.style.display=env==='gym'?'':'none'});
+  document.querySelectorAll('.d'+day+'-home-block').forEach(b=>{b.style.display=env==='home'?'':'none'});
+  document.getElementById('d'+day+'-gym').className='etb-btn'+(env==='gym'?' on-gym':'');
+  const hBtn=document.getElementById('d'+day+'-home');
+  if(hBtn)hBtn.className='etb-btn'+(env==='home'?' on-home':'');
+}
+
+// AI CONTROLS
+function selWorkout(el,val){document.querySelectorAll('.ws-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');selWorkoutVal=val;}
+function updateOuraBadge(v){
+  const badge=document.getElementById('oura-badge'),hint=document.getElementById('oura-hint');
+  const n=parseInt(v);
+  if(!v||isNaN(n)||n<0||n>100){badge.className='oura-badge';badge.textContent='—';hint.textContent='Enter your score from the Oura app';selEnergyVal=null;return;}
+  selEnergyVal=n;
+  if(n>=85){badge.className='oura-badge opt';badge.textContent='★ Optimal — ready for action';hint.textContent='85+ · Push weight, full load';}
+  else if(n>=70){badge.className='oura-badge good';badge.textContent='◆ Good — well recovered';hint.textContent='70–84 · Normal progression';}
+  else{badge.className='oura-badge pay';badge.textContent='⚠ Pay attention — not fully recovered';hint.textContent='Under 70 · Reduce intensity, mobility focus';}
+}
+function selOura(v){const n=parseInt(v);if(!isNaN(n)&&n>=0&&n<=100)selEnergyVal=n;}
+function selEnv(env){
+  selEnvVal=env;
+  document.getElementById('env-gym').className='env-opt'+(env==='gym'?' sel':'');
+  document.getElementById('env-home').className='env-opt'+(env==='home'?' sel':'');
+  document.getElementById('env-gym').querySelector('.env-check').textContent=env==='gym'?'✓':'';
+  document.getElementById('env-home').querySelector('.env-check').textContent=env==='home'?'✓':'';
+}
+
+// ACCORDION
+function toggle(head){
+  const body=head.nextElementSibling,arr=head.querySelector('.wblock-arr');
+  const open=body.classList.toggle('open');
+  arr.style.transform=open?'rotate(180deg)':'';
+}
+
+// GENERATE
+async function generatePlan(){
+  const btn=document.getElementById('gen-btn'),output=document.getElementById('ai-output'),body=document.getElementById('ai-out-body');
+  const key=getApiKey();
+  if(!key){
+    output.classList.add('vis');
+    body.innerHTML='<span style="color:#d09090;font-size:11px">Please enter your Anthropic API key above and tap Save, then try again.</span>';
+    return;
+  }
+  btn.disabled=true;output.classList.add('vis');
+  body.innerHTML='<div class="ai-loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span style="margin-left:6px">Reviewing your history...</span></div>';
+
+  const recent=logs.slice(0,6);
+  const logSum=recent.length===0?'No sessions yet — first session.':
+    recent.map(l=>`${fmtDate(l.date)} | ${l.workout} | ${l.oura!==undefined?'Oura Readiness '+l.oura:'Energy '+l.energy+'/10'} | RPE ${l.rpe||'?'} | Symptoms: ${l.symptoms==='g'?'none':l.symptoms==='y'?'mild':'significant'} | Weights: ${l.sets||'none'} | Row: ${l.rowDist||'none'} @ ${l.rowSplit||'—'} | TM: ${l.tmDur||'none'}${l.tmDetail?' / '+l.tmDetail:''} | Notes: ${l.notes||'—'}`).join('
+');
+
+  let assess='';
+  try{const s=JSON.parse(localStorage.getItem(SK_ASSESS)||'{}');if(s.data){const d=s.data;assess=`Assessment: Bench ${d.bench}, Row ${d['row-ex']}, Press ${d.press}, Lat ${d.lat}, Carry ${d.carry}, Goblet ${d.goblet}, Sumo ${d.sumo}, LP ${d.legpress}, Split ${d.split}, Adductor ${d.adduct}. Row 2k: ${d['row-2k']} @${d['row-spm']}SPM. TM: walk ${d['tm-walk']}mph / jog ${d['tm-jog']}mph / max ${d['tm-max']} / phase ${d['tm-phase']}. EDS: balance ${d.balance}, tibialis ${d.tib}, plank ${d.plank}, wrist ${d.wrist}/10.`;}}catch(e){}
+
+  const readinessLabel=selEnergyVal===null?'Not entered':selEnergyVal>=85?'Optimal ('+selEnergyVal+')':selEnergyVal>=70?'Good ('+selEnergyVal+')':'Pay attention ('+selEnergyVal+')';
+
+  const sys=`You are an expert fitness coach for equestrian athletes with hypermobile EDS (hEDS). Generate specific workout recommendations for one session.
+
+EDS rules always: stability before strength; forearm planks only (no plank-ups); no full push-ups until 4+ weeks; split squats back foot flat only; no knee flexion past 90° in early training; rowing — don't force the catch past comfortable compression.
+
+Oura readiness logic: Under 70 → 2 sets, same or lighter weight, mobility focus, no new PRs. 70–79 → 2–3 sets, hold weight, standard session. 80–84 → 3 sets, normal progression if last session clean. 85+ → full load, push weight if form was solid, prioritize strength gains.
+
+Treadmill: Phase 1 = walk only; Phase 2 = walk 2min/jog 1min; Phase 3 = walk 90s/jog 90s. Day B = incline walk only, never jog. Day C = consider dropping one phase due to leg fatigue.
+
+Respond with ONLY a JSON object, no markdown, no prose, no backticks — just the raw JSON:
+{
+  "summary": "2-3 sentence overall recommendation based on readiness and history",
+  "exercises": [
+    {"name": "exact exercise name", "rec": "weight × sets × reps or duration", "cue": "one brief form cue"}
+  ],
+  "rowing": {"rec": "e.g. 2000m @ 2:38/500m", "note": "brief cue"},
+  "treadmill": {"rec": "phase + speeds + duration, or null if not applicable", "note": "brief cue"},
+  "eds_note": "one specific observation from their history"
+}
+
+Use these exact exercise names: DB Bench Press, Single-Arm DB Row, DB Shoulder Press, Lat Pulldown, Face Pulls, Bicep Curls, Wrist Roller, Suitcase Carry, Wall Push-Ups, Doorframe Rows, Superman Hold, Seated Shoulder Taps, Towel Grip Rows, Tibialis Raises, Calf Raises, Single-Leg Balance, Lateral Band Walks, Clamshells, Dead Bug, Goblet Squat, DB Sumo Deadlift, Leg Press, Split Squat, Adductor Machine, Hamstring Curl, DB Romanian Deadlift, Bodyweight Squat, Sumo Squat, Hip Thrust, BOSU Lateral Step-Overs, Isometric Adductor Squeeze, Wall Sit, Forearm Plank, Pallof Press, Side-Lying Hip Abduction. Only include exercises relevant to the selected workout.`;
+
+  const usr=`Today: ${selWorkoutVal} | Oura Readiness: ${readinessLabel} | Environment: ${selEnvVal==='gym'?'Full gym':'Home / BOSU'}
+
+${assess?'BASELINE:
+'+assess+'
+':''}RECENT SESSIONS (newest first):
+${logSum}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system:sys,messages:[{role:'user',content:usr}]})});
+    if(!res.ok){const err=await res.json().catch(()=>({}));body.innerHTML=`<span style="color:#d09090">Error ${res.status}: ${err.error?.message||'Check your API key and try again.'}</span>`;btn.disabled=false;return;}
+    const data=await res.json();
+    const raw=(data.content?.find(b=>b.type==='text')?.text||'').trim();
+    let plan=null;
+    try{
+      // Strip markdown fences if present
+      const jsonStr=raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();
+      plan=JSON.parse(jsonStr);
+    }catch(e){
+      // Fallback to plain text display
+      body.innerHTML=raw.replace(/
+/g,'<br>');
+      btn.disabled=false;return;
+    }
+    // Store plan globally keyed by exercise name (lowercase for getAIRec lookup)
+    aiPlan={};
+    if(plan.exercises)plan.exercises.forEach(ex=>{
+      if(ex.name){
+        // Store both original case and lowercase; fmtRec expects {raw} format
+        const entry={rec:ex.rec||'',cue:ex.cue||'',raw:ex.rec||''};
+        aiPlan[ex.name]=entry;
+        aiPlan[ex.name.toLowerCase()]=entry;
+      }
+    });
+    if(plan.rowing&&plan.rowing.rec){
+      const re={rec:plan.rowing.rec,cue:plan.rowing.note||'',raw:plan.rowing.rec};
+      aiPlan['Rowing']=re;aiPlan['rowing']=re;aiPlan['rowing machine']=re;
+    }
+    if(plan.treadmill&&plan.treadmill.rec&&plan.treadmill.rec!=='null'){
+      const te={rec:plan.treadmill.rec,cue:plan.treadmill.note||'',raw:plan.treadmill.rec};
+      aiPlan['Treadmill']=te;aiPlan['treadmill']=te;
+    }
+    // Persist so it survives tab switches
+    try{localStorage.setItem(SK_AIPLAN,JSON.stringify(aiPlan));}catch(e){}
+    // Render formatted card
+    body.innerHTML=renderAIPlanHTML(plan);
+    // Push recs into detail panels and log form
+    updatePlanUI();
+    applyAIRecsToDetailPanels();
+    updateLogFields();
+  }catch(e){body.innerHTML='<span style="color:#d09090">Connection error. Check your network and try again.</span>';}
+  btn.disabled=false;
+}
+
+function renderAIPlanHTML(plan){
+  let html='';
+  if(plan.summary)html+=`<div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">${plan.summary}</div>`;
+  if(plan.exercises&&plan.exercises.length){
+    html+=`<div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:8px">Today's Exercises</div>`;
+    html+=plan.exercises.map(ex=>`<div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2);flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--text);flex:1;min-width:120px">${ex.name}</span>
+      <span class="ai-rec">${ex.rec}</span>
+      ${ex.cue?`<span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);width:100%;padding-left:2px">↳ ${ex.cue}</span>`:''}
+    </div>`).join('');
+  }
+  if(plan.rowing&&plan.rowing.rec){
+    html+=`<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:5px">Rowing</div>
+      <div style="font-size:12px;color:var(--text)">${plan.rowing.rec}</div>
+      ${plan.rowing.note?`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:3px">↳ ${plan.rowing.note}</div>`:''}
+    </div>`;
+  }
+  if(plan.treadmill&&plan.treadmill.rec&&plan.treadmill.rec!=='null'){
+    html+=`<div style="margin-top:10px">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:5px">Treadmill</div>
+      <div style="font-size:12px;color:var(--text)">${plan.treadmill.rec}</div>
+      ${plan.treadmill.note?`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:3px">↳ ${plan.treadmill.note}</div>`:''}
+    </div>`;
+  }
+  if(plan.eds_note){
+    html+=`<div style="margin-top:12px;padding:10px 12px;border-radius:6px;background:#fdf0f0;border:1px solid #d4b0b0">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#8a3a3a;margin-bottom:4px">EDS Note</div>
+      <div style="font-size:11px;color:#5a2a2a;line-height:1.6">${plan.eds_note}</div>
+    </div>`;
+  }
+  return html;
+}
+
+function applyAIRecsToDetailPanels(){
+  // Remove stale chips from previous generate
+  document.querySelectorAll('.ai-rec-chip').forEach(el=>el.remove());
+  // Inject chips into exercise list items
+  document.querySelectorAll('.exlist li').forEach(li=>{
+    const nameEl=li.querySelector('.ex-name');
+    if(!nameEl)return;
+    const raw=nameEl.childNodes[0]?.textContent?.trim()||nameEl.textContent.trim();
+    let match=aiPlan[raw];
+    if(!match){
+      const short=raw.split(' ').slice(0,2).join(' ').toLowerCase();
+      const key=Object.keys(aiPlan).find(k=>k.toLowerCase().startsWith(short)||short.startsWith(k.toLowerCase().split(' ').slice(0,2).join(' ')));
+      if(key)match=aiPlan[key];
+    }
+    if(match){
+      const chip=document.createElement('span');
+      chip.className='ai-rec ai-rec-chip';
+      chip.textContent='❖ '+match.rec;
+      if(match.cue)chip.title=match.cue;
+      nameEl.appendChild(chip);
+    }
+  });
+  // Inject into rowing/treadmill wblock metas
+  document.querySelectorAll('.wblock-head').forEach(head=>{
+    const title=head.querySelector('.wblock-title');
+    if(!title)return;
+    const t=title.textContent.toLowerCase();
+    let match=null;
+    if(t.includes('rowing')||t.includes('row —')||t.includes('row-'))match=aiPlan['Rowing'];
+    else if(t.includes('treadmill'))match=aiPlan['Treadmill'];
+    if(match){
+      const meta=head.querySelector('.wblock-meta');
+      if(meta&&!meta.querySelector('.ai-rec-chip')){
+        const chip=document.createElement('span');
+        chip.className='ai-rec ai-rec-chip';
+        chip.style.marginLeft='6px';
+        chip.textContent='❖ '+match.rec;
+        meta.appendChild(chip);
+      }
+    }
+  });
+}
+
+// Look up a rec from aiPlan by exercise name (fuzzy)
+function getAIRec(exName) {
+  if(!exName)return null;
+  const key=exName.toLowerCase();
+  if(aiPlan[key])return aiPlan[key];
+  // Try first two words
+  const short=key.split(' ').slice(0,2).join(' ');
+  const found=Object.keys(aiPlan).find(k=>k.toLowerCase().startsWith(short)||short.startsWith(k.toLowerCase().split(' ').slice(0,2).join(' ')));
+  return found?aiPlan[found]:null;
+}
+
+// Format a rec entry for display (JSON format uses .rec string directly)
+function fmtRec(entry) {
+  if(!entry)return null;
+  return entry.rec||entry.raw||null;
+}
+
+// alias for updatePlanUI — use applyAIRecsToDetailPanels as the single source
+function updatePlanUI(){applyAIRecsToDetailPanels();}
+
+
+
+
+// DYNAMIC LOG FIELDS
+const LOG_EXERCISES = {
+  'Day A — Upper Body (Gym)': ['DB Bench Press','Single-Arm DB Row','DB Shoulder Press','Lat Pulldown','Face Pulls','Bicep Curls','Wrist Roller','Suitcase Carry'],
+  'Day A — Upper Body (Home)': ['Wall Push-Ups','Doorframe Rows','Superman Hold','Seated Shoulder Taps','Towel Grip Rows','Suitcase Carry'],
+  'Day B — Stability': ['Tibialis Raises','Calf Raises','Single-Leg Balance','Lateral Band Walks','Clamshells','Dead Bug'],
+  'Day C — Lower Body (Gym)': ['Goblet Squat','DB Sumo Deadlift','Leg Press','Split Squat','Adductor Machine','Hamstring Curl','DB Romanian Deadlift'],
+  'Day C — Lower Body (Home)': ['Bodyweight Squat','Sumo Squat','Hip Thrust','Split Squat','BOSU Lateral Step-Overs','Isometric Adductor Squeeze','Wall Sit'],
+  'Rowing (standalone)': [],
+  'Rest / Active Recovery': []
+};
+
+const GYM_DAYS = ['Day A — Upper Body (Gym)','Day C — Lower Body (Gym)'];
+const ROW_DAYS = ['Day A — Upper Body (Gym)','Day A — Upper Body (Home)','Day B — Stability','Day C — Lower Body (Gym)','Day C — Lower Body (Home)','Rowing (standalone)'];
+const TM_DAYS = ['Day A — Upper Body (Gym)','Day C — Lower Body (Gym)'];
+
+function updateLogFields() {
+  const workout = document.getElementById('f-workout').value;
+  const exes = LOG_EXERCISES[workout] || [];
+  const setsBlock = document.getElementById('f-sets-block');
+  const setsRows = document.getElementById('f-sets-rows');
+  const rowBlock = document.getElementById('f-row-block');
+  const tmBlock = document.getElementById('f-tm-block');
+
+  // Show/hide rowing
+  if(rowBlock) rowBlock.style.display = ROW_DAYS.includes(workout) ? '' : 'none';
+  // Show/hide treadmill
+  if(tmBlock) tmBlock.style.display = TM_DAYS.includes(workout) ? '' : 'none';
+  // Show/hide sets block
+  if(exes.length) {
+    setsBlock.style.display = '';
+    // Build rows — 3 set inputs per exercise
+    setsRows.innerHTML = exes.map(ex => `
+      <div class="f-set-row" data-ex="${ex}" style="margin-bottom:10px">
+        <div class="flabel" style="margin-bottom:5px">${ex}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <input class="finput f-s1" type="text" placeholder="Set 1 — e.g. 25lb×10" style="font-size:12px;padding:8px 10px">
+          <input class="finput f-s2" type="text" placeholder="Set 2" style="font-size:12px;padding:8px 10px">
+          <input class="finput f-s3" type="text" placeholder="Set 3" style="font-size:12px;padding:8px 10px">
+        </div>
+      </div>`).join('');
+    // Try to pre-fill from last AI recommendation
+    fillFromAI(workout, exes);
+  } else {
+    setsBlock.style.display = 'none';
+    setsRows.innerHTML = '';
+  }
+}
+
+function fillFromAI(workout, exes) {
+  if (!Object.keys(aiPlan).length) return;
+  exes.forEach(ex => {
+    const rec = getAIRec(ex);
+    if (!rec) return;
+    const row = document.querySelector(`.f-set-row[data-ex="${ex}"]`);
+    if (!row) return;
+    const formatted = fmtRec(rec);
+    if (!formatted) return;
+    const s1 = row.querySelector('.f-s1');
+    const s2 = row.querySelector('.f-s2');
+    const s3 = row.querySelector('.f-s3');
+    if (s1) s1.placeholder = 'Set 1 — AI: ' + formatted;
+    if (s2) s2.placeholder = 'Set 2 — AI: ' + formatted;
+    if (s3) s3.placeholder = 'Set 3 — AI: ' + formatted;
+  });
+}
+
+// LOG
+function addLog(){
+  const date=document.getElementById('f-date').value;
+  if(!date){alert('Please fill in a date.');return;}
+  // Collect dynamic set rows
+  const setRows=[];
+  document.querySelectorAll('.f-set-row').forEach(row=>{
+    const ex=row.dataset.ex,s1=row.querySelector('.f-s1')?.value,s2=row.querySelector('.f-s2')?.value,s3=row.querySelector('.f-s3')?.value;
+    if(s1||s2||s3)setRows.push({ex,s1:s1||'',s2:s2||'',s3:s3||''});
+  });
+  const setsText=setRows.map(r=>{const parts=[r.s1,r.s2,r.s3].filter(Boolean);return r.ex+(parts.length?': '+parts.join(' / '):'');}).join(' | ');
+  const ouraVal=parseInt(document.getElementById('f-energy').value)||null;
+  logs.unshift({
+    date,
+    workout:document.getElementById('f-workout').value,
+    oura:ouraVal,
+    energy:ouraVal||null,
+    rpe:parseInt(document.getElementById('f-rpe').value)||null,
+    symptoms:document.getElementById('f-symptoms').value,
+    rowDist:document.getElementById('f-row-dist')?.value||'',
+    rowSplit:document.getElementById('f-row-split')?.value||'',
+    tmDur:document.getElementById('f-tm-dur')?.value||'',
+    tmDetail:document.getElementById('f-tm-detail')?.value||'',
+    sets:setsText,
+    notes:document.getElementById('f-notes').value
+  });
+  saveLogs();renderLogs();updateMetrics();
+  document.getElementById('f-energy').value='';
+  document.getElementById('f-rpe').value='';
+  document.getElementById('f-notes').value='';
+  const rd=document.getElementById('f-row-dist');if(rd)rd.value='';
+  const rs=document.getElementById('f-row-split');if(rs)rs.value='';
+  const td=document.getElementById('f-tm-dur');if(td)td.value='';
+  const tdt=document.getElementById('f-tm-detail');if(tdt)tdt.value='';
+  document.querySelectorAll('.f-set-row input').forEach(i=>i.value='');
+}
+function renderLogs(){
+  const c=document.getElementById('loglist');
+  if(!logs.length){c.innerHTML='<div style="font-size:11px;color:var(--text3);padding:12px 0">No sessions yet.</div>';return;}
+  const sL={g:'Stable',y:'Mild',r:'Significant'},sC={g:'itag-g',y:'itag-y',r:'itag-r'};
+  c.innerHTML=logs.map(l=>`<div class="logitem sym-${l.symptoms}">
+    <div class="logitem-date">${fmtDate(l.date)}</div>
+    <div style="flex:1">
+      <div class="logitem-title">${l.workout}</div>
+      <div class="logitem-detail">${l.oura!=null?'Readiness '+l.oura:l.energy?'Energy '+l.energy+'/10':''}${l.rpe?` · RPE ${l.rpe}`:''}${l.rowDist?` · Row: ${l.rowDist}${l.rowSplit?' @ '+l.rowSplit:''}` :''}${l.tmDur?` · TM: ${l.tmDur}`:''}</div>
+      ${l.sets?`<div class="logitem-sets">${l.sets}</div>`:''}
+      ${l.notes?`<div class="logitem-detail" style="color:var(--text3);margin-top:2px">${l.notes}</div>`:''}
+      <div class="itags"><span class="itag ${sC[l.symptoms]}">${sL[l.symptoms]}</span>${l.rpe?`<span class="itag itag-b">RPE ${l.rpe}</span>`:''}${l.rowDist?`<span class="itag itag-b">Row</span>`:''}${l.tmDur?`<span class="itag itag-b">TM</span>`:''}</div>
+    </div></div>`).join('');
+}
+function updateMetrics(){
+  document.getElementById('m-sessions').textContent=logs.length;
+  const ouraLogs=logs.filter(l=>l.oura!=null);document.getElementById('m-avgE').textContent=ouraLogs.length?Math.round(ouraLogs.reduce((s,l)=>s+l.oura,0)/ouraLogs.length)+'  avg':'—';
+  const rArr=logs.filter(l=>l.rpe);
+  document.getElementById('m-avgRPE').textContent=rArr.length?(rArr.reduce((s,l)=>s+l.rpe,0)/rArr.length).toFixed(1):'—';
+  document.getElementById('m-symptom').textContent=logs[0]?({g:'✓',y:'~',r:'!'})[logs[0].symptoms]:'—';
+}
+
+// MEASUREMENTS
+function addMeasurement(){
+  const date=document.getElementById('m-date').value;if(!date){alert('Please enter a date.');return;}
+  measurements.unshift({date,weight:document.getElementById('m-weight').value,fit:document.getElementById('m-fit').value,waist:parseFloat(document.getElementById('m-waist').value)||null,hips:parseFloat(document.getElementById('m-hips').value)||null,thigh:parseFloat(document.getElementById('m-thigh').value)||null,arm:parseFloat(document.getElementById('m-arm').value)||null,notes:document.getElementById('m-notes').value});
+  saveMeasurements();renderMeasurements();updateCurrentMeasurements();
+  ['m-weight','m-waist','m-hips','m-thigh','m-arm','m-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-fit').value='';
+}
+function renderMeasurements(){
+  const tb=document.getElementById('m-hist-body');
+  if(!measurements.length){tb.innerHTML='<tr><td colspan="7" style="color:var(--text3);padding:10px">No measurements yet.</td></tr>';return;}
+  tb.innerHTML=measurements.map(m=>`<tr><td>${fmtDate(m.date)}</td><td>${m.waist||'—'}"</td><td>${m.hips||'—'}"</td><td>${m.thigh||'—'}"</td><td>${m.arm||'—'}"</td><td>${m.weight?m.weight+' lb':'—'}</td><td>${m.fit||'—'}</td></tr>`).join('');
+}
+function updateCurrentMeasurements(){
+  if(!measurements.length)return;
+  const cur=measurements[0],prev=measurements[1];
+  const fields=[{key:'waist',label:'Waist (in)'},{key:'hips',label:'Hips (in)'},{key:'thigh',label:'Thigh (in)'},{key:'arm',label:'Arm (in)'}];
+  document.getElementById('measure-current').innerHTML=fields.map(f=>{
+    const val=cur[f.key],pval=prev?.[f.key];
+    let delta='';
+    if(val&&pval){const d=(val-pval).toFixed(1);delta=`<div style="font-size:9px;margin-top:2px;color:${d<0?'rgba(150,200,150,0.8)':'var(--text3)'}">${d>0?'+':''}${d}" from last</div>`;}
+    return `<div class="mbox"><div class="mbox-val">${val||'—'}</div><div class="mbox-label">${f.label}</div>${delta}</div>`;
+  }).join('');
+}
+
+// ASSESSMENT
+function saveAssessment(){
+  const fields=['row-warm','row-2k','row-spm','tm-walk','tm-jog','tm-max','tm-phase','bench','row-ex','press','lat','carry','goblet','sumo','legpress','split','adduct','balance','tib','plank','wrist'];
+  const data={};fields.forEach(f=>{data[f]=document.getElementById('a-'+f)?.value||'';});
+  localStorage.setItem(SK_ASSESS,JSON.stringify({data,date:new Date().toLocaleDateString()}));
+  document.getElementById('assess-msg').textContent='✓ Saved — '+new Date().toLocaleDateString();
+}
+function loadAssessment(){
+  try{const s=JSON.parse(localStorage.getItem(SK_ASSESS)||'{}');if(!s.data){document.getElementById('assess-msg').textContent='No saved data.';return;}
+  Object.entries(s.data).forEach(([k,v])=>{const el=document.getElementById('a-'+k);if(el)el.value=v;});
+  document.getElementById('assess-msg').textContent='✓ Loaded from '+s.date;}catch(e){document.getElementById('assess-msg').textContent='Could not load.';}
+}
+
+// ── CIRCUIT DATA ──
+// Form notes & anatomy mods keyed by exercise name
+const FORM_NOTES = {
+  'DB Bench Press / Floor Press': {form:'Elbows ~45° from body (not flared out). 3-second descent. Press through mid-palm, not heel of hand.',anatomy:'Turn wrists slightly outward to accommodate your natural carry angle — elbows naturally splay wider than in men, and forcing them tight strains the joint. If floor press, stack shoulders directly over wrists.'},
+  'Wall Push-Ups': {form:'Body in straight line, core braced. 3-second descent. Push through mid-palm.',anatomy:'Turn hands slightly outward ~30–45° — women have a larger carry angle (avg 15° vs 10° in men), so hands turned out aligns the elbow joint correctly and makes the movement significantly more comfortable and effective. Feet can be slightly wider than shoulder-width.'},
+  'Single-Arm DB Row': {form:'Bench supported. Pull elbow to lower rib, not shoulder. Keep torso parallel to floor. Squeeze shoulder blade at top.',anatomy:'Due to wider pelvis and longer torso-to-arm ratio common in women, you may need the bench slightly higher. Row toward your hip, not your armpit — the "lower rib" cue matters.'},
+  'DB Shoulder Press': {form:'Seated. Wrists straight throughout — never cocked. Press in front of, not behind, your head. Control the descent.',anatomy:'Use a neutral or slightly angled grip if straight feels uncomfortable — women often have a narrower biacromial width (shoulder breadth) relative to body size, making full supinated grip uncomfortable. Wrist-straight cue is doubly important for EDS.'},
+  'Lat Pulldown': {form:'Grip slightly wider than shoulder-width. Lead with elbows pointing down and forward. Pull to upper chest, not behind neck.',anatomy:'Avoid behind-the-neck pulldowns entirely — especially important with EDS. For women with narrower shoulder width, a grip just outside shoulder-width (not max-wide) is more comfortable and engages lats better.'},
+  'Face Pulls with Rope': {form:'Elbows stay high and out. Pull to forehead level. Squeeze shoulder blades at the end. Use light weight — this is precision work.',anatomy:'Women are often more prone to internal shoulder rotation from daily activities. Face pulls directly counter this. If the rope handle forces wrists into an awkward angle, adjust grip — this exercise has wide grip latitude.'},
+  'Bicep Curls': {form:'Elbows pinned at sides. Full range of motion — full extension at bottom. No swinging. Control both directions.',anatomy:'Women\'s greater carry angle means the natural arc of the curl may angle slightly outward — that\'s fine and anatomically correct. Don\'t force elbows perfectly in if it feels like it\'s straining the inner elbow.'},
+  'Wrist Roller / Plate Pinch': {form:'Wrist roller: roll up slowly, lower slowly. Plate pinch: squeeze hard, hold tall. Both are EDS priority — grip strength protects wrist joints.',anatomy:'EDS-specific: strengthen gradually. The goal is tendon and ligament support, not maximum load. If knuckles go white and wrist starts to shake, reduce weight.'},
+  'Suitcase Carry': {form:'Stand tall — resist leaning toward the weight. Shoulders level. Ribs down. Walk with control. This is anti-lateral flexion core work.',anatomy:'Due to wider hips, women naturally have a slight pelvic shift during unilateral carries — consciously brace your opposite hip to keep pelvis level. The core engagement is the workout, not the walking speed.'},
+  'Forearm Plank': {form:'Elbows directly under shoulders. Forearms parallel. Long spine — no pike or sag. Breathe steadily. No wrist loading at all.',anatomy:'Women on average have lower upper body strength relative to bodyweight — 20-30s is a completely valid starting point. Quality always over duration. If hips rotate, the set is over.'},
+  'Pallof Press': {form:'Stand tall, soft knees. Press straight out from chest — resist rotation. Control both directions. Engage obliques.',anatomy:'Wider hips mean more leverage against you in rotation. That\'s actually beneficial — you\'re getting more out of the exercise. Stand with feet slightly wider than shoulder-width for stability.'},
+  'Doorframe Pallof Substitute': {form:'Loop towel around door handle at chest height. Hold close to chest, then press out. Body stays square. Resist rotation.',anatomy:'Same cue as Pallof — wider stance is fine and natural. Keep hips square even when the resistance wants to rotate you.'},
+  'Side-Lying Hip Abduction': {form:'Bottom leg bent for stability. Top leg straight or slightly bent. Lift controlled — lead with heel, not toe. Control the descent.',anatomy:'Women have wider hips and often stronger hip abductors than men relative to bodyweight. Still start light — EDS means the muscles need to work harder because the ligaments aren\'t providing passive stability. Go slow and deliberate.'},
+  'Tibialis Anterior Raises': {form:'Back to wall, heels 6 inches from baseboard. Lift toes toward shins — keep heels on ground. Control down.',anatomy:'EDS-specific: this targets the muscle most directly responsible for ankle stability in hypermobile individuals. It will fatigue faster than expected at first. That\'s the point — build this endurance patiently.'},
+  'Calf Raises': {form:'3-second eccentric (lowering) phase. Full ROM — rise fully, lower completely. Hold lightly for balance only.',anatomy:'Women have slightly higher rate of Achilles tendon issues. The slow eccentric protects the tendon while building strength. If calf cramps occur, reduce range of motion and increase hydration.'},
+  'Single-Leg Balance': {form:'Stand tall. Soft knee on standing leg. Arms out for balance is fine. Eyes forward or on a fixed point.',anatomy:'EDS-specific: hypermobile ankles will wobble significantly more than average — that\'s neuromuscular work happening. Build from 10s to 30s over weeks. Do not rush to the BOSU.'},
+  'Single-Leg Balance on BOSU': {form:'Dome up. Step on carefully, find balance before lifting the other foot. Soft knee. Core braced.',anatomy:'EDS: this is advanced for hypermobile ankles. Only progress here once flat ground feels genuinely stable (30s no wobble). The instability of the BOSU is the point — but too much instability too soon teaches compensation, not control.'},
+  'Lateral Band Walks': {form:'Stay in a quarter-squat the entire time. Steps are small — 6-8 inches. Keep tension on the band at all times. Toes forward.',anatomy:'Wider Q-angle in women means knees naturally want to cave medially during this exercise. Consciously push knees outward — this is exactly what corrects the biomechanics that contribute to knee injury risk. The cue "knees out" is especially important here.'},
+  'Wrist Circles': {form:'Arms extended at shoulder height. Slow, deliberate circles — full range of motion. Both directions equally.',anatomy:'EDS: the goal is lubrication and proprioception, not range challenge. Do not push into hypermobile ranges. Stay in comfortable ROM and feel the joint tracking.'},
+  'Shoulder CARs': {form:'One arm at a time. Move as slowly as possible through the full arc. The other arm stays still. Breathe.',anatomy:'EDS: shoulder hypermobility is common. CARs should stay within the range you can actively control — never use momentum to push further. If you feel a "clunk" in the shoulder, reduce range.'},
+  'Finger Extensions': {form:'Spread fingers as wide as is comfortable. Hold 3 seconds. Release. Repeat.',anatomy:'EDS wrist/hand: finger extensors directly balance the flexors and reduce the pattern of joint compression. Do this slowly — rushing defeats the purpose.'},
+  'Cat-Cow': {form:'On all fours. Inhale — drop belly, lift chest (Cow). Exhale — round spine, tuck chin (Cat). Move from the spine, not the neck.',anatomy:'For women with EDS: avoid hypermobile lumbar extension in Cow position. Think "chest lifts gently" rather than "back arches maximally." The spine should feel mobile, not loaded.'},
+  'Thoracic Rotations': {form:'Hands behind head. Rotate only from the upper back — hips stay still. 8 each side.',anatomy:'EDS: thoracic mobility is often reduced while lumbar is hypermobile. This exercise specifically targets the correct area. If you feel the rotation coming from your lower back rather than mid-back, reduce range.'},
+  'Dead Bug': {form:'Low back pressed into the floor throughout. Exhale as you extend opposite arm and leg. If back lifts off the floor, range is too large.',anatomy:'EDS core: this is one of the safest core exercises for hypermobile individuals because it teaches the transverse abdominis to work without loading the spine. Slow and small is better than fast and large.'},
+  'Ankle Alphabet': {form:'Seated, leg extended. Draw A–Z with your big toe. Move slowly — every letter counts. Full range of motion.',anatomy:'EDS ankle: this is joint proprioception training disguised as mobility work. The slow, varied movement patterns re-educate the nervous system about where the ankle is in space — exactly what EDS ankles lack.'},
+  'Clamshells': {form:'Feet together throughout. Lift top knee without rolling the hip back. Squeeze glute med at the top. Small controlled movement.',anatomy:'Women have naturally stronger hip abductors than men on average, but EDS patients often have weakness here because the joint relies on active stabilization. The movement should feel like it\'s happening at the hip, not the spine.'},
+  'Worlds Greatest Stretch': {form:'Lunge position. Hand inside front foot. Rotate and reach arm to ceiling. Open chest. Hold briefly, return.',anatomy:'Women often have tighter hip flexors from sitting (office work, riding) and greater natural thoracic mobility. Use this stretch to open both simultaneously. Don\'t push the rotation — let gravity and breath do it.'},
+  'Rowing Machine': {form:'Catch: shins vertical, arms straight, back long. Drive: push through legs first, then lean back slightly, then pull arms. Finish: legs down, handle to lower ribs, elbows behind body.',anatomy:'EDS: the rowing catch position requires full hip flexion — if this compresses your knees uncomfortably, stop just before full compression. The power comes from legs, not the back — protect the lumbar spine by keeping the back angle consistent, not wildly rocking.'},
+  'Superman Hold': {form:'Prone (face down). Arms at sides or overhead. Squeeze glutes and lift chest and legs simultaneously. Hold 3s. Lower with control.',anatomy:'Women tend to have longer torsos relative to leg length — you may find the lift pattern feels asymmetric. Focus on the squeeze from the glutes and lower back rather than on height of lift.'},
+  'Towel Grip Rows': {form:'Loop towel around door handle. Lean back — body in straight line. Pull chest to door, squeeze shoulder blades. Heels on floor.',anatomy:'Adjust foot position to control difficulty — feet further forward = harder. Women often have more shoulder flexibility, which can cause the shoulder to "open up" at the top rather than setting. Think "pack the shoulder blade" before pulling.'},
+  'Doorframe Rows': {form:'Hold both sides of doorframe or a single handle. Lean back, body straight. Row chest to door, control return.',anatomy:'Same as towel rows — focus on shoulder blade retraction. If wrists feel strained at the doorframe angle, adjust grip to what feels neutral.'},
+  'Seated Shoulder Taps': {form:'Seated on BOSU dome. Core braced. Tap opposite shoulder with one hand while staying balanced. Alternate sides.',anatomy:'The BOSU seated position challenges pelvic stability — wider hips actually give you a more stable base here. Focus on not letting the pelvis shift side to side with each tap.'},
+  'Suitcase Carry (Home)': {form:'Same as gym carry — stand tall, shoulders level, resist leaning into the weight. Walk with control.',anatomy:'A gallon jug is approximately 8.3 lbs when full. Use this as your starting point. If too light, carry two and switch sides.'},
+  'Bounce and Stick': {form:'On BOSU dome. Small two-foot bounce. Land and hold still for 2 seconds before next rep. Core engaged on landing.',anatomy:'EDS: the "stick" is the critical part of this exercise — it trains the deceleration control that hypermobile ankles lack. Don\'t rush to the next bounce. Each landing is a proprioception rep.'},
+  'Goblet Squat': {form:'Hold DB at chest — elbows inside knees at the bottom. 3-second descent. Hips slightly below parallel if comfortable. Drive up through mid-foot.',anatomy:'Women\'s wider Q-angle means knees will want to cave inward at the bottom. Consciously push knees out to match toe direction throughout. The goblet position (DB at chest) counterbalances the hips, making this one of the safest squat variations for EDS — great for learning depth.'},
+  'DB Sumo Deadlift': {form:'Wide stance, toes 30–45° out. Hip hinge — not a squat. Bar/DB stays close to legs. Hips drive forward at the top. Neutral spine throughout.',anatomy:'The sumo stance is biomechanically well-suited to women\'s wider hip structure. Keep knees in line with toes at all times — they will want to cave. Squeeze the adductors and glutes simultaneously at the top. This is your saddle muscle deadlift pattern.'},
+  'Leg Press': {form:'Feet shoulder-width, mid-foot on platform. Lower to 90° — no deeper. Drive through heels. Do not let knees cave in. No full lockout at the top.',anatomy:'EDS: never lock out knees at the top — this hyperextends the joint. Feet slightly wider and toes slightly out is more natural for women. The leg press allows heavy loading without spinal compression — excellent for EDS.'},
+  'Split Squat': {form:'Back foot flat on floor (no heel elevated yet). Front foot far enough forward that shin stays mostly vertical. Lower slowly, 3s descent. Front knee tracks over second toe.',anatomy:'EDS: back foot flat is non-negotiable at this stage — heel elevation massively increases the demand on the knee. Women\'s Q-angle makes knee caving the primary error here. Watch your front knee — if it dives in, step wider. This is excellent for the unilateral hip strength needed for posting trot.'},
+  'Adductor Machine': {form:'Sit tall — no slouching. Set range to what feels comfortable, not maximal. Squeeze slowly together, control the opening. This is precision work, not power.',anatomy:'This is your most riding-specific exercise. The adductors are responsible for the gentle, continuous leg contact that communicates with the horse. Train them the same way — steady, controlled, never forced. EDS note: the seat and hip flexors are often involved; focus the squeeze at the inner thigh, not the hip.'},
+  'Hamstring Curl': {form:'Prone or seated depending on machine. Curl toward glutes — full ROM. 3-second eccentric (lowering). Don\'t let hips pike up on the prone version.',anatomy:'EDS: hamstring tendons are commonly affected. Start with lower weight and longer eccentrics. The hamstring works in tandem with the glutes to produce posterior pelvic tilt — important for the deep seat in dressage. Prone machine: keep hips pressed down to protect the lumbar.'},
+  'DB Romanian Deadlift': {form:'Soft knee throughout. Hinge at the hip — send hips back, not down. DB tracks close to the legs. Lower until you feel a gentle hamstring pull. Squeeze glutes to stand.',anatomy:'EDS: do not chase maximum depth. The hamstring stretch is the cue to stop — hypermobile individuals can often descend far past where the hamstrings are actually loaded. Stop at the "pull," not at the floor. Women often have greater natural lumbar curvature — brace your core hard before each rep to maintain neutral spine.'},
+  'Bodyweight Squat': {form:'Feet shoulder-width, toes slightly out. Arms forward for counterbalance. 3-second descent, pause at bottom, slow controlled rise.',anatomy:'EDS home foundation: this is your baseline movement quality check. If knees cave, heels rise, or you feel unstable, don\'t add load yet. Women\'s wider hips mean you may naturally squat with a slightly wider stance — that\'s correct anatomy, not a compensation.'},
+  'Sumo Squat': {form:'Wide stance, toes pointed significantly out. Hinge down — knees track toes at all times. Squeeze inner thighs at the top.',anatomy:'Excellent inner thigh (adductor) exercise — the saddle muscle. The wide stance naturally suits women\'s hip structure. If you feel it in your knees rather than inner thighs, your stance may be too wide or toes not turned out enough.'},
+  'Hip Thrust': {form:'Upper back on floor or bench edge. Feet flat, hip-width. Drive hips up until torso is parallel to floor. 2-second squeeze at top. Control the descent.',anatomy:'Excellent glute exercise with minimal spinal loading — ideal for EDS. Women\'s wider hips mean the natural foot placement may be slightly wider than shoulder-width. Squeeze glutes, not quads. If you feel it in your lower back, you\'re overextending — stop just short of full hip extension.'},
+  'BOSU Lateral Step-Overs': {form:'Step laterally over the BOSU from side to side. Step on dome, step off the other side. Control the landing on each side.',anatomy:'EDS: this challenges single-leg balance and lateral hip stability simultaneously. Land softly — ankle control is key. If ankles feel very wobbly, reduce speed and focus on the landing quality. The hip abductors (glute med) should feel this — if you just feel calf fatigue, focus more on driving from the hip.'},
+  'Isometric Adductor Squeeze': {form:'Supine (on back), knees bent, pillow or ball between knees. Squeeze gradually to maximum comfortable tension. Hold. Release slowly.',anatomy:'The most riding-specific exercise in the home program. Think about the difference between the white-knuckle grip of a nervous rider vs the quiet, following leg of an experienced one — train the latter. Progressive squeeze, not sudden clamp. EDS: the adductors attach near the pubic symphysis, which can be hypermobile — keep the squeeze moderate, never forceful.'},
+  'Wall Sit': {form:'Back flat against wall. Thighs parallel to floor or slightly above. Feet flat, hip-width. Hold with steady breathing. Use counter or wall lightly for balance only.',anatomy:'Isometric quad endurance — directly translates to posting trot stamina. Women\'s Q-angle can put extra valgus stress on the knee in this position — ensure knees are in line with toes. If knees drift inward during the hold, the set is over. EDS: do not lock knees or hyperextend at any point.'},
+};
+
+const CIRCUITS = {
+  'A-warmup':{name:'Joint Prep + Warm-Up',day:'Day A',rounds:1,isWarmup:true,exercises:[
+    {name:'Wrist Circles',detail:'90s each way — slow, full ROM both directions',img:'wrist_circles.png'},
+    {name:'Finger Extensions',detail:'2×10 — spread wide, hold 3 seconds',img:'finger_extensions.png'},
+    {name:'Shoulder CARs',detail:'5 each side — one arm, full controlled rotation',img:'shoulder_cars.png'},
+    {name:'Cat-Cow',detail:'8–10 reps — inhale arch, exhale round',img:'cat_cow.png'},
+    {name:'Thoracic Rotations',detail:'8 each side — hands behind head, upper body only',img:'thoracic_rotations.png'},
+    {name:'Dead Bug',detail:'2×6 each side — exhale on extension, low back to floor',img:'dead_bug.png'},
+    {name:'Rowing Machine',detail:'5 min easy — posture, arms and back focus',img:'row.png'},
+  ]},
+  'A-gym-upper':{name:'Upper Strength — Gym',day:'Day A',rounds:3,isWarmup:false,exercises:[
+    {name:'DB Bench Press / Floor Press',detail:'8–10 reps — elbows ~45°, 3s descent',img:'bench_press.png'},
+    {name:'Single-Arm DB Row',detail:'8–10 reps each — bench supported, pull to lower rib',img:'dumbbell_row.png'},
+    {name:'DB Shoulder Press',detail:'8–10 reps — seated, wrists straight',img:'shoulder_press.png'},
+    {name:'Lat Pulldown',detail:'8 reps — medium overhand, pull to upper chest',img:'lat_pulldown.png'},
+    {name:'Face Pulls with Rope',detail:'12 reps — elbows high, pull to forehead',img:'face_pulls.png'},
+    {name:'Bicep Curls',detail:'12–15 reps — elbows close, full ROM',img:'bicep_curl.png'},
+    {name:'Wrist Roller / Plate Pinch',detail:'2×30s — grip / EDS priority',img:'wrist_roller.png'},
+    {name:'Suitcase Carry',detail:'40s each side — heavy single DB, resist lean',img:'suitcase_carry.png'},
+  ]},
+  'A-core':{name:'Core Finisher',day:'Day A',rounds:3,isWarmup:false,exercises:[
+    {name:'Forearm Plank',detail:'20–30s — no wrist loading, brace everything',img:'forearm_plank.png'},
+    {name:'Pallof Press',detail:'10 each side — cable anti-rotation',img:'pallof_press.png'},
+    {name:'Side-Lying Hip Abduction',detail:'12 each side — slow, glute med emphasis',img:'hip_abduction_leg_raise.png'},
+  ]},
+  'A-home-upper':{name:'Upper Strength — Home',day:'Day A',rounds:3,isWarmup:false,exercises:[
+    {name:'Rowing Machine',detail:'5 min — arms and back focus strokes',img:'row.png'},
+    {name:'Wall Push-Ups',detail:'3×10 — wrist neutral, 3s descent',img:'wall_push_up.png'},
+    {name:'Doorframe Rows',detail:'3×10 — lean back, pull chest to door',img:'doorframe_rows.png'},
+    {name:'Superman Hold',detail:'3×8 — prone, lift chest and legs 3s',img:'superman_hold.png'},
+    {name:'Seated Shoulder Taps',detail:'3×8 each side',img:'shoulder_taps.png'},
+    {name:'Towel Grip Rows',detail:'3×10 — loop around doorknob, lean and pull',img:'towel_grip_rows.png'},
+    {name:'Suitcase Carry (Home)',detail:'3×40s each side — gallon jug or heavy bag',img:'suitcase_carry.png'},
+  ]},
+  'B-warmup':{name:'Day B Warm-Up',day:'Day B',rounds:1,isWarmup:true,exercises:[
+    {name:'Rowing Machine',detail:'5 min easy — very light, joint warm only',img:'row.png'},
+    {name:'Ankle Alphabet',detail:'1× each foot — slow, full ROM',img:'ankle_alphabet.png'},
+    {name:'Worlds Greatest Stretch',detail:'5 each side — lunge + thoracic rotation',img:'worlds_greatest_stretch.png'},
+    {name:'Clamshells',detail:'2×10 each side — activate glute med',img:'clamshell.png'},
+  ]},
+  'B-ankle-rehab':{name:'Ankle + Shin Rehab',day:'Day B',rounds:3,isWarmup:false,exercises:[
+    {name:'Tibialis Anterior Raises',detail:'15 reps — back to wall, lift toes',img:'tibialis_raise.png'},
+    {name:'Calf Raises',detail:'12 reps — 3s eccentric descent',img:'calf_raise.png'},
+    {name:'Single-Leg Balance',detail:'20s each — flat ground; build to 30s',img:'single_leg_balance.png'},
+    {name:'Single-Leg Balance on BOSU',detail:'15s each — once flat ground is solid',img:'single_leg_bosu_balance.png'},
+    {name:'Lateral Band Walks',detail:'10 each way — mini-band at ankles, stay low',img:'lateral_band_walks.png'},
+    {name:'Bounce and Stick',detail:'8 reps — two-foot bounce, hold 2s on landing',img:'bosu_bounce_and_stick.png'},
+  ]},
+  'B-stability':{name:'Full-Body Stability',day:'Day B',rounds:3,isWarmup:false,exercises:[
+    {name:'Clamshells',detail:'12 reps — glute med, slow and controlled',img:'clamshell.png'},
+    {name:'Dead Bug',detail:'8 each side — 2s pause, no hip rotation',img:'dead_bug.png'},
+    {name:'Single-Leg Balance',detail:'20s each side',img:'single_leg_balance.png'},
+    {name:'Ankle Alphabet',detail:'1× each foot — active proprioception',img:'ankle_alphabet.png'},
+  ]},
+  'C-warmup':{name:'Day C Warm-Up',day:'Day C',rounds:1,isWarmup:true,exercises:[
+    {name:'Ankle Alphabet',detail:'1× each foot — seated, slow',img:'ankle_alphabet.png'},
+    {name:'Worlds Greatest Stretch',detail:'8 reps — hip hinge into squat',img:'worlds_greatest_stretch.png'},
+    {name:'Clamshells',detail:'10 each side — glute med activation',img:'clamshell.png'},
+    {name:'Rowing Machine',detail:'5 min easy — lower body warm',img:'row.png'},
+  ]},
+  'C-gym-lower':{name:'Lower Body — Gym',day:'Day C',rounds:3,isWarmup:false,exercises:[
+    {name:'Goblet Squat',detail:'8–10 reps — DB at chest, 3s eccentric',img:'goblet_squat.png'},
+    {name:'DB Sumo Deadlift',detail:'8–10 reps — wide stance, toes out, hinge not squat',img:'sumo_dead_lift.png'},
+    {name:'Leg Press',detail:'12 reps — 90° max, no knee lockout',img:'leg_press.png'},
+    {name:'Split Squat',detail:'8–10 reps each — back foot flat only',img:'split_squat.png'},
+    {name:'Adductor Machine',detail:'12 reps — slow; your saddle muscle',img:'adductor_abductor.png'},
+    {name:'Hamstring Curl',detail:'10 reps — 3s eccentric',img:'hamstring_curl.png'},
+    {name:'DB Romanian Deadlift',detail:'8–10 reps — hinge focus, not load',img:'romanian_deadlift.png'},
+  ]},
+  'C-home-lower':{name:'Lower Body — Home',day:'Day C',rounds:3,isWarmup:false,exercises:[
+    {name:'Rowing Machine',detail:'5 min — legs-only drill strokes',img:'row.png'},
+    {name:'Bodyweight Squat',detail:'12 reps — 3s eccentric, pause at bottom',img:'bodyweight_squat.png'},
+    {name:'Sumo Squat',detail:'12 reps — inner thigh emphasis',img:'sumo_squat.png'},
+    {name:'Hip Thrust',detail:'12 reps — off floor, 2s squeeze',img:'hip_thrust.png'},
+    {name:'Split Squat',detail:'8 reps each — back foot flat, slow descent',img:'split_squat.png'},
+    {name:'BOSU Lateral Step-Overs',detail:'8 each — hip abductor + balance',img:'bosu_lateral_step_over.png'},
+    {name:'Isometric Adductor Squeeze',detail:'3×20s — pillow between knees',img:'isometric_adductor_squeeze.png'},
+    {name:'Wall Sit',detail:'30–45s — use counter for balance',img:'wall_sit.png'},
+  ]},
+};
+
+// ── CIRCUIT STATE ──
+let cState = {circuit:null,exIdx:0,round:1,totalRounds:1,phase:'exercise',timer:null,showingNotes:false};
+
+function startCircuit(day, block) {
+  const key = `${day}-${block}`;
+  const circuit = CIRCUITS[key];
+  if (!circuit) { alert('Circuit coming soon for: ' + key); return; }
+  cState = {circuit,exIdx:0,round:1,totalRounds:circuit.rounds,phase:'exercise',timer:null,showingNotes:false};
+  document.getElementById('c-day-label').textContent = circuit.day;
+  document.getElementById('c-block-name').textContent = circuit.name;
+  document.getElementById('c-rounds-total').textContent = circuit.rounds;
+  document.getElementById('c-complete-detail').textContent = `${circuit.day} · ${circuit.name}`;
+  document.getElementById('circuit-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  renderCircuitExercise();
+}
+
+function renderCircuitExercise() {
+  const {circuit,exIdx,round,totalRounds} = cState;
+  const ex = circuit.exercises[exIdx];
+  const total = circuit.exercises.length;
+  document.getElementById('c-ex-num').textContent = exIdx + 1;
+  document.getElementById('c-of-num').textContent = total;
+  document.getElementById('c-round-num').textContent = round;
+  document.getElementById('c-rounds-total').textContent = totalRounds;
+  const totalSteps = totalRounds * total;
+  const completedSteps = (round - 1) * total + exIdx;
+  document.getElementById('c-progress-bar').style.width = (completedSteps / totalSteps * 100) + '%';
+  document.getElementById('c-ex-name').textContent = ex.name;
+  const aiRec = getAIRec(ex.name);
+  const aiRecStr = fmtRec(aiRec);
+  const baseDetail = ex.detail;
+  if (aiRecStr) {
+    document.getElementById('c-ex-detail').innerHTML =
+      `<span style="color:#f0ebe0;background:var(--green2);padding:2px 8px;border-radius:10px;font-size:10px;letter-spacing:0.5px">✦ ${aiRecStr}</span>&nbsp;&nbsp;<span style="color:var(--text3)">${baseDetail}</span>`;
+  } else {
+    document.getElementById('c-ex-detail').textContent = baseDetail;
+  }
+  // Form notes
+  const notes = FORM_NOTES[ex.name];
+  const notesEl = document.getElementById('c-form-notes');
+  if (notes && notesEl) {
+    notesEl.innerHTML = `<div style="margin-bottom:6px"><strong style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green2)">Form</strong><br>${notes.form}</div>${notes.anatomy?`<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)"><strong style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#b8923a">Anatomy Note</strong><br>${notes.anatomy}</div>`:''}`;
+    notesEl.style.display = 'none';
+    cState.showingNotes = false;
+    const toggleBtn = document.getElementById('c-notes-toggle');
+    if (toggleBtn) toggleBtn.textContent = 'Form Notes ↓';
+  }
+  // Image
+  const img = document.getElementById('c-img');
+  const ph = document.getElementById('c-img-ph');
+  img.style.display = 'block'; ph.style.display = 'none';
+  img.src = ex.img;
+  showView('exercise');
+}
+
+function toggleFormNotes() {
+  const notesEl = document.getElementById('c-form-notes');
+  const btn = document.getElementById('c-notes-toggle');
+  if (!notesEl) return;
+  cState.showingNotes = !cState.showingNotes;
+  notesEl.style.display = cState.showingNotes ? 'block' : 'none';
+  btn.textContent = cState.showingNotes ? 'Hide Notes ↑' : 'Form Notes ↓';
+}
+
+function showView(view) {
+  const exView = document.getElementById('c-exercise-view');
+  const restView = document.getElementById('c-rest-view');
+  const completeView = document.getElementById('c-complete-view');
+  exView.style.display = view==='exercise' ? 'flex' : 'none';
+  restView.style.display = view==='rest' ? 'flex' : 'none';
+  completeView.style.display = view==='complete' ? 'flex' : 'none';
+  cState.phase = view;
+}
+
+function circuitNext() {
+  clearRestTimer();
+  const {circuit,exIdx,round,totalRounds} = cState;
+  const total = circuit.exercises.length;
+  if (exIdx + 1 < total) {
+    cState.exIdx = exIdx + 1;
+    renderCircuitExercise();
+  } else if (round < totalRounds) {
+    cState.round = round + 1;
+    cState.exIdx = 0;
+    startRest();
+  } else {
+    showComplete();
+  }
+}
+
+function startRest() {
+  document.getElementById('c-rest-sub').textContent = `1 minute · Round ${cState.round} of ${cState.totalRounds} up next`;
+  showView('rest');
+  let secs = 60;
+  document.getElementById('c-timer-num').textContent = secs;
+  cState.timer = setInterval(() => {
+    secs--;
+    document.getElementById('c-timer-num').textContent = secs;
+    if (secs <= 0) { clearRestTimer(); renderCircuitExercise(); }
+  }, 1000);
+}
+
+function clearRestTimer() {
+  if (cState.timer) { clearInterval(cState.timer); cState.timer = null; }
+}
+
+function showComplete() {
+  clearRestTimer();
+  document.getElementById('c-progress-bar').style.width = '100%';
+  showView('complete');
+}
+
+function closeCircuit() {
+  clearRestTimer();
+  document.getElementById('circuit-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Swipe to advance in exercise view (manual only)
+let touchStartX = 0;
+document.getElementById('circuit-overlay').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+document.getElementById('circuit-overlay').addEventListener('touchend', e => {
+  if (cState.phase !== 'exercise') return;
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 60) circuitNext();
+}, {passive:true});
+
+// ── RIDING LOG ──
+const SK_RIDES = 'eq_rides_v1';
+const SK_FOCUS = 'eq_ride_focus_v1';
+let rideLogs = [];
+
+function saveRideFocus() {
+  const focus = {
+    f1: document.getElementById('rf-focus1').value,
+    f2: document.getElementById('rf-focus2').value,
+    f3: document.getElementById('rf-focus3').value,
+    quote: document.getElementById('rf-quote').value,
+    date: new Date().toLocaleDateString()
+  };
+  try { localStorage.setItem(SK_FOCUS, JSON.stringify(focus)); } catch(e) {}
+  document.getElementById('rf-msg').textContent = '✓ Saved — visible at the top of this tab';
+  renderRideFocus();
+}
+
+function renderRideFocus() {
+  try {
+    const f = JSON.parse(localStorage.getItem(SK_FOCUS) || '{}');
+    if (!f.f1 && !f.f2 && !f.f3) return;
+    const display = document.getElementById('ride-focus-display');
+    const list = document.getElementById('ride-focus-list');
+    display.style.display = 'block';
+    const items = [f.f1, f.f2, f.f3].filter(Boolean).map(i => `<div style="padding:3px 0;display:flex;gap:8px"><span style="color:var(--green2)">✦</span>${i}</div>`).join('');
+    const quote = f.quote ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #c0ccc0;font-style:italic;font-size:11px;color:var(--text3)">"${f.quote}"</div>` : '';
+    list.innerHTML = items + quote;
+    // Pre-fill form fields
+    if (f.f1) document.getElementById('rf-focus1').value = f.f1;
+    if (f.f2) document.getElementById('rf-focus2').value = f.f2;
+    if (f.f3) document.getElementById('rf-focus3').value = f.f3;
+    if (f.quote) document.getElementById('rf-quote').value = f.quote;
+  } catch(e) {}
+}
+
+function addRideLog() {
+  const date = document.getElementById('rl-date').value;
+  if (!date) { alert('Please enter a date.'); return; }
+  const entry = {
+    date,
+    type: document.getElementById('rl-type').value,
+    horse: document.getElementById('rl-horse').value,
+    instructor: document.getElementById('rl-instructor').value,
+    worked: document.getElementById('rl-worked').value,
+    good: document.getElementById('rl-good').value,
+    improve: document.getElementById('rl-improve').value,
+    feedback: document.getElementById('rl-feedback').value,
+    body: document.getElementById('rl-body').value,
+    feel: document.getElementById('rl-feel').value,
+    calories: parseInt(document.getElementById('rl-calories').value)||null,
+    duration: parseInt(document.getElementById('rl-duration').value)||null,
+    distance: parseFloat(document.getElementById('rl-distance').value)||null,
+  };
+  rideLogs.unshift(entry);
+  try { localStorage.setItem(SK_RIDES, JSON.stringify(rideLogs)); } catch(e) {}
+  renderRideLogs();
+  ['rl-horse','rl-instructor','rl-worked','rl-good','rl-improve','rl-feedback','rl-body','rl-calories','rl-duration','rl-distance'].forEach(id => { const el=document.getElementById(id); if(el)el.value=''; });
+}
+
+function renderRideLogs() {
+  const c = document.getElementById('ride-loglist');
+  if (!rideLogs.length) { c.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:8px 0;font-family:\'DM Mono\',monospace">No lessons logged yet.</div>'; return; }
+  const feelColor = {great:'var(--green2)',good:'var(--green2)',ok:'#b8923a',tough:'var(--red)'};
+  const feelLabel = {great:'Great',good:'Good',ok:'OK',tough:'Tough'};
+  c.innerHTML = rideLogs.map(r => `
+    <div class="logitem" style="flex-direction:column;gap:8px;border-left-color:${feelColor[r.feel]||'var(--linen)'}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div class="logitem-title">${r.type}${r.horse?' · '+r.horse:''}</div>
+        <div class="logitem-date">${fmtDate(r.date)}</div>
+      </div>
+      ${r.instructor?`<div class="logitem-detail" style="color:var(--text3)">with ${r.instructor}</div>`:''}
+      ${r.worked?`<div class="logitem-detail"><strong>Worked on:</strong> ${r.worked}</div>`:''}
+      ${r.good?`<div class="logitem-detail"><strong>Went well:</strong> ${r.good}</div>`:''}
+      ${r.improve?`<div class="logitem-detail"><strong>Needs work:</strong> ${r.improve}</div>`:''}
+      ${r.feedback?`<div class="logitem-detail" style="font-style:italic;color:var(--text3)">"${r.feedback}"</div>`:''}
+      ${r.body?`<div class="logitem-detail" style="color:var(--green2)">Body: ${r.body}</div>`:''}
+      ${(r.calories||r.duration||r.distance)?`<div class="logitem-detail" style="color:var(--text3);margin-top:2px">${[r.duration?r.duration+' min':null, r.distance?r.distance+' mi':null, r.calories?r.calories+' kcal':null].filter(Boolean).join(' · ')}</div>`:''}
+      <div class="itags"><span class="itag" style="background:var(--green-light);color:${feelColor[r.feel]||'var(--text3)'};border-color:${feelColor[r.feel]||'var(--border)'}">${feelLabel[r.feel]||r.feel}</span></div>
+    </div>`).join('');
+}
+
+function loadRideLogs() {
+  try { const s = JSON.parse(localStorage.getItem(SK_RIDES)); if (Array.isArray(s) && s.length) { rideLogs = s; return true; } } catch(e) {}
+  return false;
+}
+
+// ── DOWNLOAD PROGRESS ──
+function downloadProgress() {
+  let assess = {};
+  try { const s = JSON.parse(localStorage.getItem(SK_ASSESS)||'{}'); if(s.data) assess = s; } catch(e) {}
+  let rideFocus = {};
+  try { rideFocus = JSON.parse(localStorage.getItem(SK_FOCUS)||'{}'); } catch(e) {}
+  const data = {
+    exportDate: new Date().toISOString(),
+    version: 'eq-fitness-v2',
+    instructions: 'To restore: open a new Claude chat, paste this JSON file and say "restore my equestrian fitness progress"',
+    logs,
+    measurements,
+    rideLogs,
+    rideFocus,
+    assessment: assess
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `eq-fitness-progress-${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// STORAGE
+function saveLogs(){try{localStorage.setItem(SK_LOGS,JSON.stringify(logs));}catch(e){}}
+function loadLogs(){try{const s=JSON.parse(localStorage.getItem(SK_LOGS));if(Array.isArray(s)&&s.length){logs=s;return true;}}catch(e){}return false;}
+function saveMeasurements(){try{localStorage.setItem(SK_MEAS,JSON.stringify(measurements));}catch(e){}}
+function loadMeasurements(){try{const s=JSON.parse(localStorage.getItem(SK_MEAS));if(Array.isArray(s)&&s.length){measurements=s;return true;}}catch(e){}return false;}
+
+// UTILS
+function fmtDate(d){if(!d)return'';const[y,m,day]=d.split('-');return`${m}/${day}/${y.slice(2)}`;}
+
+// INIT
+document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+document.getElementById('m-date').value=new Date().toISOString().split('T')[0];
+document.getElementById('rl-date').value=new Date().toISOString().split('T')[0];
+if(!loadLogs()){}
+loadMeasurements();
+loadRideLogs();
+renderLogs();updateMetrics();renderMeasurements();updateCurrentMeasurements();
+renderRideLogs();renderRideFocus();
+initApiKey();
+updateLogFields();
+// Restore oura score from last log if available
+if(logs.length&&logs[0].oura){const oi=document.getElementById('oura-score');if(oi)oi.value='';}
+// Restore last AI plan and re-apply chips to detail panels
+try{const sp=JSON.parse(localStorage.getItem(SK_AIPLAN)||'null');if(sp&&Object.keys(sp).length){aiPlan=sp;setTimeout(()=>{updatePlanUI();applyAIRecsToDetailPanels();},100);}}catch(e){}
+
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}
+</script>
+</body>
+</html>
