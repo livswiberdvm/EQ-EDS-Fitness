@@ -183,7 +183,7 @@ body {
 @keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
 
 /* ── WEEKLY STRIP ── */
-.weekly-wrap{margin:0 16px 16px}
+.weekly-wrap{margin:0 16px 16px;background:var(--bg);border-radius:10px;}
 .weekly-img{
   width:100%;border-radius:10px;display:block;
   mix-blend-mode:multiply;object-fit:contain;
@@ -214,7 +214,7 @@ body {
 .day-card-img{
   width:100%;aspect-ratio:3/2;object-fit:cover;object-position:center top;
   display:block;mix-blend-mode:multiply;
-  background:var(--cream2);
+  background:var(--bg);
 }
 .day-card-body{padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-end}
 .day-card-desc{font-size:11px;color:var(--text2);line-height:1.5;flex:1}
@@ -425,7 +425,7 @@ body {
 
 <style>
 /* CIRCUIT OVERLAY */
-.circuit-overlay{position:fixed;inset:0;z-index:1000;background:var(--cream);display:none;flex-direction:column}
+.circuit-overlay{position:fixed;inset:0;z-index:1000;background:var(--bg);display:none;flex-direction:column}
 .circuit-overlay.active{display:flex}
 .circuit-topbar{background:var(--green);padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top));display:flex;align-items:center;gap:12px;flex-shrink:0}
 .circuit-close{background:none;border:none;color:rgba(240,235,224,0.7);font-size:22px;cursor:pointer;padding:0;line-height:1}
