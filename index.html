@@ -463,7 +463,18 @@ body {
 .circuit-ctr:last-child{border-right:none}
 .circuit-ctr-val{font-family:'Playfair Display',serif;font-size:20px;color:var(--green);line-height:1}
 .circuit-ctr-lbl{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-top:2px}
-.circuit-ex-view{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.circuit-ex-timer{display:flex;flex-direction:column;align-items:center;margin:8px 0 4px}
+.circuit-ex-timer-ring{width:72px;height:72px;border-radius:50%;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;flex-direction:column;margin-bottom:4px;position:relative;overflow:hidden}
+.circuit-ex-timer-ring svg{position:absolute;inset:0;width:72px;height:72px;transform:rotate(-90deg)}
+.circuit-ex-timer-ring circle{fill:none;stroke:var(--green);stroke-width:3;stroke-dasharray:200;stroke-dashoffset:200;transition:stroke-dashoffset 1s linear;stroke-linecap:round}
+.circuit-ex-timer-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--green);line-height:1;position:relative;z-index:1}
+.circuit-ex-timer-lbl{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
+.circuit-log-area{margin:8px 16px 4px;padding:10px 12px;background:var(--cream2);border:1px solid var(--border);border-radius:8px}
+.circuit-log-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.circuit-log-inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+.circuit-log-input{font-family:'DM Mono',monospace;font-size:11px;padding:6px 8px;border:1px solid var(--border);border-radius:5px;background:var(--card-bg);color:var(--text);text-align:center;width:100%}
+.circuit-log-input::placeholder{color:var(--text3);font-size:9px}
+
 .circuit-ex-body{flex:1;padding:14px 16px 0;display:flex;flex-direction:column}
 .circuit-ex-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.2}
 .circuit-ex-detail{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:1px;margin-bottom:10px}
@@ -516,10 +527,29 @@ body {
       <div class="circuit-ex-name" id="c-ex-name">Exercise</div>
       <div class="circuit-ex-detail" id="c-ex-detail">Detail</div>
       <div class="circuit-ai-rec" id="c-ai-rec">&#10022; AI today: —</div>
+      <!-- Exercise timer (shown only for timed exercises) -->
+      <div class="circuit-ex-timer" id="c-ex-timer" style="display:none">
+        <div class="circuit-ex-timer-ring" id="c-ex-timer-ring">
+          <svg viewBox="0 0 72 72"><circle cx="36" cy="36" r="32" id="c-ex-timer-circle"/></svg>
+          <div class="circuit-ex-timer-num" id="c-ex-timer-num">30</div>
+        </div>
+        <div class="circuit-ex-timer-lbl">seconds · <span id="c-ex-timer-side">tap to start</span></div>
+        <button onclick="startExTimer()" id="c-ex-timer-btn" style="margin-top:4px;padding:4px 14px;border-radius:5px;border:1px solid var(--green);background:transparent;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);cursor:pointer">Start Timer</button>
+      </div>
       <div class="circuit-img-wrap">
         <img class="circuit-img" id="c-img" src="" alt="" onerror="this.style.display='none';document.getElementById('c-img-ph').style.display='flex'">
         <div class="circuit-img-ph" id="c-img-ph" style="display:none">Image coming soon</div>
       </div>
+    </div>
+    <!-- Log inputs for this exercise -->
+    <div class="circuit-log-area" id="c-log-area">
+      <div class="circuit-log-label" id="c-log-label">Log Set</div>
+      <div class="circuit-log-inputs" id="c-log-inputs">
+        <input class="circuit-log-input" id="c-log-s1" type="text" placeholder="Set 1">
+        <input class="circuit-log-input" id="c-log-s2" type="text" placeholder="Set 2">
+        <input class="circuit-log-input" id="c-log-s3" type="text" placeholder="Set 3">
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);margin-top:5px">lbs × reps per side · e.g. 25×10</div>
     </div>
     <div class="circuit-bottom">
       <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -612,7 +642,10 @@ body {
       <div class="env-opt" id="env-home" onclick="selEnv('home')"><div class="env-check"></div>Home / BOSU</div>
     </div>
 
-    <button class="gen-btn" id="gen-btn" onclick="generatePlan()">GENERATE ✦</button>
+    <div style="display:flex;gap:8px;margin-top:0">
+      <button class="gen-btn" id="gen-btn" onclick="generatePlan()" style="flex:1">GENERATE ✦</button>
+      <button onclick="clearAIPlan()" title="Clear generated plan" style="padding:0 14px;border-radius:8px;background:transparent;border:1px solid var(--border);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);cursor:pointer;white-space:nowrap">Clear</button>
+    </div>
 
     <!-- API Key input (stored in localStorage, never sent anywhere except Anthropic) -->
     <div id="apikey-row" style="margin-top:10px">
@@ -718,9 +751,9 @@ body {
       </div>
     </div>
 
-    <!-- Gym block -->
+    <!-- Gym DB block -->
     <div class="wblock dA-gym-block">
-      <div class="wblock-head blue" onclick="toggle(this)"><div class="wblock-title">Upper Strength — Gym</div><div class="wblock-meta">35 min · RPE 6–7</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-head blue" onclick="toggle(this)"><div class="wblock-title">Upper Strength — Dumbbells</div><div class="wblock-meta">20 min · RPE 6–7</div><div class="wblock-arr">▾</div></div>
       <div class="wblock-body">
         <img class="wblock-img" src="imgdagym.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
         <ul class="exlist">
@@ -730,10 +763,6 @@ body {
         <li><img src="dumbbell_row.png" alt="" class="ex-img ex-img-wide"></li>
         <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">DB Shoulder Press — seated, wrists straight</span><span class="ex-sets">3×8–10</span></li>
         <li><img src="shoulder_press.png" alt="" class="ex-img ex-img-wide"></li>
-        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Lat Pulldown — medium overhand, pull to upper chest</span><span class="ex-sets">3×8</span></li>
-        <li><img src="lat_pulldown.png" alt="" class="ex-img ex-img-wide"></li>
-        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Face Pulls with rope — elbows high, pull to forehead</span><span class="ex-sets">3×12</span></li>
-        <li><img src="face_pulls.png" alt="" class="ex-img ex-img-wide"></li>
         <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Bicep Curls — elbows close, full ROM</span><span class="ex-sets">3×12–15</span></li>
         <li><img src="bicep_curl.png" alt="" class="ex-img ex-img-tall"></li>
         <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Wrist roller or plate pinch — grip / EDS priority</span><span class="ex-sets">2×30s</span></li>
@@ -742,25 +771,40 @@ body {
         <li><img src="suitcase_carry.png" alt="" class="ex-img ex-img-tall"></li>
         </ul>
         <div class="note eds"><span>⚠</span> Forearm plank only — no plank-ups. No full push-ups until wrist strength established (4+ weeks). On the bench press: rotate wrists slightly outward to align with your natural elbow carry angle.</div>
-        <div class="note tip" style="margin-top:6px"><span>✦</span> Shoulder press form tip: press in front of your head, never behind. Women's narrower biacromial width means behind-the-neck pressing strains the shoulder — especially with EDS laxity.</div>
+        <div class="note tip" style="margin-top:6px"><span>✦</span> Shoulder press: press in front of your head, never behind. Then walk to the machine area for the cable/machine circuit below.</div>
         <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('A','gym-upper')">Kick On ✦</button>
+      </div>
+    </div>
+
+    <!-- Machine circuit block -->
+    <div class="wblock dA-gym-block">
+      <div class="wblock-head blue" onclick="toggle(this)"><div class="wblock-title">Cable &amp; Machine Circuit</div><div class="wblock-meta">15 min · Machine area</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-body">
+        <ul class="exlist">
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Machine</span><span class="ex-name">Lat Pulldown — medium overhand, pull to upper chest</span><span class="ex-sets">3×8</span></li>
+        <li><img src="lat_pulldown.png" alt="" class="ex-img ex-img-wide"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-gym">Cable</span><span class="ex-name">Face Pulls with rope — elbows high, pull to forehead</span><span class="ex-sets">3×12</span></li>
+        <li><img src="face_pulls.png" alt="" class="ex-img ex-img-wide"></li>
+        </ul>
+        <div class="note tip" style="margin-top:8px"><span>✦</span> Do this circuit immediately after the dumbbell block — machines are on the other side of the gym. Light weight on face pulls; these are precision work, not strength work.</div>
+        <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('A','gym-machine')">Kick On ✦</button>
       </div>
     </div>
 
     <!-- Core finisher -->
     <div class="wblock dA-gym-block">
-      <div class="wblock-head blue" onclick="toggle(this)"><div class="wblock-title">Core Finisher</div><div class="wblock-meta">10 min</div><div class="wblock-arr">▾</div></div>
+      <div class="wblock-head blue" onclick="toggle(this)"><div class="wblock-title">Core Finisher</div><div class="wblock-meta">10 min · Floor</div><div class="wblock-arr">▾</div></div>
       <div class="wblock-body">
         <img class="wblock-img" src="imgdacore.png" alt="" style="width:100%;max-height:260px;object-fit:contain;object-position:center;border-radius:6px;mix-blend-mode:multiply;margin:8px 0;display:block">
         <ul class="exlist">
         <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Forearm plank — no wrist loading</span><span class="ex-sets">3×20–30s</span></li>
         <li><img src="forearm_plank.png" alt="" class="ex-img ex-img-wide"></li>
-        <li><span class="ex-dot">·</span><span class="badge b-gym">Gym</span><span class="ex-name">Pallof press — cable anti-rotation</span><span class="ex-sets">3×10 each</span></li>
-        <li><img src="pallof_press.png" alt="" class="ex-img ex-img-tall"></li>
+        <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Dead Bug — exhale on extension, low back pressed to floor</span><span class="ex-sets">3×8 each side</span></li>
+        <li><img src="dead_bug.png" alt="" class="ex-img ex-img-tall"></li>
         <li><span class="ex-dot">·</span><span class="badge b-both">Both</span><span class="ex-name">Side-lying hip abduction — slow, glute med</span><span class="ex-sets">2×12 each</span></li>
         <li><img src="hip_abduction_leg_raise.png" alt="" class="ex-img ex-img-wide"></li>
         </ul>
-        <div class="note tip" style="margin-top:8px"><span>✦</span> Plank: 20s of perfect position beats 60s of sagging hips. EDS note — if your lumbar is hypermobile, actively posterior-tilt your pelvis before bracing. Ribs down, abs in, breathe steadily.</div>
+        <div class="note tip" style="margin-top:8px"><span>✦</span> All floor work, no equipment needed. Plank: 20s of perfect position beats 60s of sagging hips. EDS: actively posterior-tilt pelvis before bracing. Dead Bug: if low back lifts off the floor, the rep is over.</div>
         <button class="btn btn-green" style="width:100%;margin-top:10px" onclick="startCircuit('A','core')">Kick On ✦</button>
       </div>
     </div>
@@ -1071,7 +1115,9 @@ body {
 
       <!-- Dynamic weight/set fields — shown for Day A/B/C -->
       <div id="f-sets-block" style="display:none">
-        <div class="flabel" style="margin-bottom:8px;margin-top:2px">Weights &amp; Reps (from AI recommendation)</div>
+        <div class="flabel" style="margin-bottom:4px;margin-top:2px">Weights &amp; Reps</div>
+        <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);margin-bottom:8px">Shorthand: lbs × reps per side — e.g. <strong>25×10</strong></div>
+        <div id="f-circuit-banner" style="display:none;background:var(--green-light);border:1px solid #b8ccb4;border-radius:6px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);margin-bottom:8px">✦ Filled from your circuit log — review and adjust before submitting</div>
         <div id="f-sets-rows"></div>
       </div>
 
@@ -1328,8 +1374,20 @@ function initApiKey(){
   }
 }
 
-// SEEDED LOG
+function clearAIPlan() {
+  aiPlan = {};
+  try { localStorage.removeItem(SK_AIPLAN); } catch(e) {}
+  const body = document.getElementById('ai-out-body');
+  if (body) body.innerHTML = '';
+  // Clear any AI rec badges from detail panels
+  document.querySelectorAll('.ai-rec').forEach(el => el.remove());
+  document.querySelectorAll('.circuit-ai-rec').forEach(el => { el.textContent = ''; el.classList.remove('vis'); });
+  updateLogFields();
+}
+
+
 let logs=[
+  {date:'2026-05-11',workout:'Day A — Upper Body (Gym)',oura:55,energy:55,rpe:null,symptoms:'y',rowDist:'1498 in 07:29',rowSplit:'2:27/500m',tmDur:'15 min',tmDetail:'Phase 1 3.5mph',sets:'DB Bench Press: 10lb x 8 reps / 10lb x 8 reps | Single-Arm DB Row: 15lb 8 each side / 25lb 8 reps each side | DB Shoulder Press: 10lb x 8 reps / 10lb x 8 reps | Lat Pulldown: 50lb 8 reps / 60lb 8 reps | Face Pulls: 30lb 12 reps / 40lb 12 reps | Bicep Curls: 10lb x 10 reps / 10lb x 10 reps | Wrist Roller: 20lb 10s grip / 20lb 10s grip | Suitcase Carry: 25lb 40 step each / 25lb 40 step Each',notes:'L ankle pain'},
   {date:'2025-05-09',workout:'Day 3 — Full Body (Gym)',oura:75,energy:7,rpe:7,symptoms:'g',rowDist:'2000m ~10 min',rowSplit:'2:41/500m',tmDur:'',tmDetail:'',sets:'Romanian DL 20lb×8–10 (↑ next), Lat Pulldown 55lb×8, Lunges BW×8–10, Push-ups off bench×10, Suitcase Carry 25lb×40s',notes:'Rowing rate 3. Ready to go up on RDL.'},
   {date:'2025-05-07',workout:'Day 2 — Upper Body (Gym)',oura:76,energy:7,rpe:7,symptoms:'g',rowDist:'1914m in 10 min',rowSplit:'~2:36/500m',tmDur:'',tmDetail:'',sets:'DB Bench 2×10lb×8–10 (↑), Single-Arm Row 20lb×8–10, Shoulder Press 2×10lb×8–10, Bicep Curls 2×10lb×12–15, Plank-ups 10 each',notes:'Bench ready to go up. ⚠ Monitor wrist on plank-ups.'},
   {date:'2025-05-05',workout:'Day 1 — Lower Body (Gym)',oura:74,energy:7,rpe:7,symptoms:'g',rowDist:'1950m in 10 min',rowSplit:'~2:33/500m',tmDur:'',tmDetail:'',sets:'Goblet 30lb×8–10, Sumo DL 30lb×8–10, Leg Press 75–80lb×12 (↑ next), Split Squat 2×15lb×8–12',notes:'Leg press worked up 70→75→80. Ready to go up next session.'}
@@ -1344,6 +1402,13 @@ function navTab(id,el){
   document.getElementById('panel-'+id).classList.add('on');
   el.classList.add('on');
   document.getElementById('content').scrollTop=0;
+  if(id==='log'){
+    // Pre-fill from circuit log if available
+    setTimeout(()=>{
+      const exes = LOG_EXERCISES[document.getElementById('f-workout')?.value] || [];
+      if(exes.length) fillFromCircuitLog(exes);
+    },100);
+  }
 }
 
 // DETAIL
@@ -1435,7 +1500,7 @@ Respond with ONLY a JSON object, no markdown, no prose, no backticks — just th
   "eds_note": "one specific observation from their history"
 }
 
-Use these exact exercise names: DB Bench Press, Single-Arm DB Row, DB Shoulder Press, Lat Pulldown, Face Pulls, Bicep Curls, Wrist Roller, Suitcase Carry, Wall Push-Ups, Doorframe Rows, Superman Hold, Seated Shoulder Taps, Towel Grip Rows, Tibialis Raises, Calf Raises, Single-Leg Balance, Lateral Band Walks, Clamshells, Dead Bug, Goblet Squat, DB Sumo Deadlift, Leg Press, Split Squat, Adductor Machine, Hamstring Curl, DB Romanian Deadlift, Bodyweight Squat, Sumo Squat, Hip Thrust, BOSU Lateral Step-Overs, Isometric Adductor Squeeze, Wall Sit, Forearm Plank, Pallof Press, Side-Lying Hip Abduction. Only include exercises relevant to the selected workout.`;
+Use these exact exercise names: DB Bench Press, Single-Arm DB Row, DB Shoulder Press, Lat Pulldown, Face Pulls, Bicep Curls, Wrist Roller, Suitcase Carry, Wall Push-Ups, Doorframe Rows, Superman Hold, Seated Shoulder Taps, Towel Grip Rows, Tibialis Raises, Calf Raises, Single-Leg Balance, Lateral Band Walks, Clamshells, Dead Bug, Goblet Squat, DB Sumo Deadlift, Leg Press, Split Squat, Adductor Machine, Hamstring Curl, DB Romanian Deadlift, Bodyweight Squat, Sumo Squat, Hip Thrust, BOSU Lateral Step-Overs, Isometric Adductor Squeeze, Wall Sit, Forearm Plank, Side-Lying Hip Abduction. Only include exercises relevant to the selected workout.`;
 
   const usr=`Today: ${selWorkoutVal} | Oura Readiness: ${readinessLabel} | Environment: ${selEnvVal==='gym'?'Full gym':'Home / BOSU'}
 
@@ -1588,7 +1653,7 @@ function updatePlanUI(){applyAIRecsToDetailPanels();}
 
 // DYNAMIC LOG FIELDS
 const LOG_EXERCISES = {
-  'Day A — Upper Body (Gym)': ['DB Bench Press','Single-Arm DB Row','DB Shoulder Press','Lat Pulldown','Face Pulls','Bicep Curls','Wrist Roller','Suitcase Carry'],
+  'Day A — Upper Body (Gym)': ['DB Bench Press','Single-Arm DB Row','DB Shoulder Press','Bicep Curls','Wrist Roller','Suitcase Carry','Lat Pulldown','Face Pulls','Forearm Plank','Dead Bug','Side-Lying Hip Abduction'],
   'Day A — Upper Body (Home)': ['Wall Push-Ups','Doorframe Rows','Superman Hold','Seated Shoulder Taps','Towel Grip Rows','Suitcase Carry'],
   'Day B — Stability': ['Tibialis Raises','Calf Raises','Single-Leg Balance','Lateral Band Walks','Clamshells','Dead Bug'],
   'Day C — Lower Body (Gym)': ['Goblet Squat','DB Sumo Deadlift','Leg Press','Split Squat','Adductor Machine','Hamstring Curl','DB Romanian Deadlift'],
@@ -1621,13 +1686,15 @@ function updateLogFields() {
       <div class="f-set-row" data-ex="${ex}" style="margin-bottom:10px">
         <div class="flabel" style="margin-bottom:5px">${ex}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-          <input class="finput f-s1" type="text" placeholder="Set 1 — e.g. 25lb×10" style="font-size:12px;padding:8px 10px">
+          <input class="finput f-s1" type="text" placeholder="Set 1 — e.g. 25×10" style="font-size:12px;padding:8px 10px">
           <input class="finput f-s2" type="text" placeholder="Set 2" style="font-size:12px;padding:8px 10px">
           <input class="finput f-s3" type="text" placeholder="Set 3" style="font-size:12px;padding:8px 10px">
         </div>
       </div>`).join('');
     // Try to pre-fill from last AI recommendation
     fillFromAI(workout, exes);
+    // Also try to pre-fill from circuit log buffer
+    fillFromCircuitLog(exes);
   } else {
     setsBlock.style.display = 'none';
     setsRows.innerHTML = '';
@@ -1650,6 +1717,30 @@ function fillFromAI(workout, exes) {
     if (s2) s2.placeholder = 'Set 2 — AI: ' + formatted;
     if (s3) s3.placeholder = 'Set 3 — AI: ' + formatted;
   });
+}
+
+function fillFromCircuitLog(exes) {
+  let buf = circuitLogBuffer;
+  // Also check sessionStorage in case user navigated away
+  if (!Object.keys(buf).length) {
+    try { const s = sessionStorage.getItem('eq_circuit_log'); if (s) buf = JSON.parse(s); } catch(e) {}
+  }
+  if (!Object.keys(buf).length) return;
+  let anyFilled = false;
+  exes.forEach(ex => {
+    const data = buf[ex];
+    if (!data) return;
+    const row = document.querySelector(`.f-set-row[data-ex="${ex}"]`);
+    if (!row) return;
+    const s1 = row.querySelector('.f-s1');
+    const s2 = row.querySelector('.f-s2');
+    const s3 = row.querySelector('.f-s3');
+    if (s1 && data.s1) { s1.value = data.s1; anyFilled = true; }
+    if (s2 && data.s2) { s2.value = data.s2; anyFilled = true; }
+    if (s3 && data.s3) { s3.value = data.s3; anyFilled = true; }
+  });
+  const banner = document.getElementById('f-circuit-banner');
+  if (banner) banner.style.display = anyFilled ? '' : 'none';
 }
 
 // LOG
@@ -1810,19 +1901,21 @@ const CIRCUITS = {
     {name:'Dead Bug',detail:'2×6 each side — exhale on extension, low back to floor',img:'dead_bug.png'},
     {name:'Rowing Machine',detail:'5 min easy — posture, arms and back focus',img:'row.png'},
   ]},
-  'A-gym-upper':{name:'Upper Strength — Gym',day:'Day A',rounds:3,isWarmup:false,exercises:[
+  'A-gym-upper':{name:'Upper Strength — Dumbbells',day:'Day A',rounds:3,isWarmup:false,exercises:[
     {name:'DB Bench Press / Floor Press',detail:'8–10 reps — elbows ~45°, 3s descent',img:'bench_press.png'},
     {name:'Single-Arm DB Row',detail:'8–10 reps each — bench supported, pull to lower rib',img:'dumbbell_row.png'},
     {name:'DB Shoulder Press',detail:'8–10 reps — seated, wrists straight',img:'shoulder_press.png'},
+    {name:'Bicep Curls',detail:'12–15 reps — elbows close, full ROM',img:'bicep_curl.png'},
+    {name:'Wrist Roller / Plate Pinch',detail:'30s — grip / EDS priority',img:'wrist_roller.png',timedSecs:30},
+    {name:'Suitcase Carry',detail:'40s each side — heavy single DB, resist lean',img:'suitcase_carry.png',timedSecs:40},
+  ]},
+  'A-gym-machine':{name:'Cable & Machine Circuit',day:'Day A',rounds:3,isWarmup:false,exercises:[
     {name:'Lat Pulldown',detail:'8 reps — medium overhand, pull to upper chest',img:'lat_pulldown.png'},
     {name:'Face Pulls with Rope',detail:'12 reps — elbows high, pull to forehead',img:'face_pulls.png'},
-    {name:'Bicep Curls',detail:'12–15 reps — elbows close, full ROM',img:'bicep_curl.png'},
-    {name:'Wrist Roller / Plate Pinch',detail:'2×30s — grip / EDS priority',img:'wrist_roller.png'},
-    {name:'Suitcase Carry',detail:'40s each side — heavy single DB, resist lean',img:'suitcase_carry.png'},
   ]},
   'A-core':{name:'Core Finisher',day:'Day A',rounds:3,isWarmup:false,exercises:[
-    {name:'Forearm Plank',detail:'20–30s — no wrist loading, brace everything',img:'forearm_plank.png'},
-    {name:'Pallof Press',detail:'10 each side — cable anti-rotation',img:'pallof_press.png'},
+    {name:'Forearm Plank',detail:'20–30s — no wrist loading, brace everything',img:'forearm_plank.png',timedSecs:25},
+    {name:'Dead Bug',detail:'8 each side — exhale on extension, low back pressed to floor',img:'dead_bug.png'},
     {name:'Side-Lying Hip Abduction',detail:'12 each side — slow, glute med emphasis',img:'hip_abduction_leg_raise.png'},
   ]},
   'A-home-upper':{name:'Upper Strength — Home',day:'Day A',rounds:3,isWarmup:false,exercises:[
@@ -1843,15 +1936,15 @@ const CIRCUITS = {
   'B-ankle-rehab':{name:'Ankle + Shin Rehab',day:'Day B',rounds:3,isWarmup:false,exercises:[
     {name:'Tibialis Anterior Raises',detail:'15 reps — back to wall, lift toes',img:'tibialis_raise.png'},
     {name:'Calf Raises',detail:'12 reps — 3s eccentric descent',img:'calf_raise.png'},
-    {name:'Single-Leg Balance',detail:'20s each — flat ground; build to 30s',img:'single_leg_balance.png'},
-    {name:'Single-Leg Balance on BOSU',detail:'15s each — once flat ground is solid',img:'single_leg_bosu_balance.png'},
+    {name:'Single-Leg Balance',detail:'20s each — flat ground; build to 30s',img:'single_leg_balance.png',timedSecs:20},
+    {name:'Single-Leg Balance on BOSU',detail:'15s each — once flat ground is solid',img:'single_leg_bosu_balance.png',timedSecs:15},
     {name:'Lateral Band Walks',detail:'10 each way — mini-band at ankles, stay low',img:'lateral_band_walks.png'},
     {name:'Bounce and Stick',detail:'8 reps — two-foot bounce, hold 2s on landing',img:'bosu_bounce_and_stick.png'},
   ]},
   'B-stability':{name:'Full-Body Stability',day:'Day B',rounds:3,isWarmup:false,exercises:[
     {name:'Clamshells',detail:'12 reps — glute med, slow and controlled',img:'clamshell.png'},
     {name:'Dead Bug',detail:'8 each side — 2s pause, no hip rotation',img:'dead_bug.png'},
-    {name:'Single-Leg Balance',detail:'20s each side',img:'single_leg_balance.png'},
+    {name:'Single-Leg Balance',detail:'20s each side',img:'single_leg_balance.png',timedSecs:20},
     {name:'Ankle Alphabet',detail:'1× each foot — active proprioception',img:'ankle_alphabet.png'},
   ]},
   'C-warmup':{name:'Day C Warm-Up',day:'Day C',rounds:1,isWarmup:true,exercises:[
@@ -1876,19 +1969,21 @@ const CIRCUITS = {
     {name:'Hip Thrust',detail:'12 reps — off floor, 2s squeeze',img:'hip_thrust.png'},
     {name:'Split Squat',detail:'8 reps each — back foot flat, slow descent',img:'split_squat.png'},
     {name:'BOSU Lateral Step-Overs',detail:'8 each — hip abductor + balance',img:'bosu_lateral_step_over.png'},
-    {name:'Isometric Adductor Squeeze',detail:'3×20s — pillow between knees',img:'isometric_adductor_squeeze.png'},
-    {name:'Wall Sit',detail:'30–45s — use counter for balance',img:'wall_sit.png'},
+    {name:'Isometric Adductor Squeeze',detail:'3×20s — pillow between knees',img:'isometric_adductor_squeeze.png',timedSecs:20},
+    {name:'Wall Sit',detail:'30–45s — use counter for balance',img:'wall_sit.png',timedSecs:35},
   ]},
 };
 
 // ── CIRCUIT STATE ──
-let cState = {circuit:null,exIdx:0,round:1,totalRounds:1,phase:'exercise',timer:null,showingNotes:false};
+let cState = {circuit:null,exIdx:0,round:1,totalRounds:1,phase:'exercise',timer:null,exTimer:null,showingNotes:false};
+let circuitLogBuffer = {}; // keyed by exercise name
 
 function startCircuit(day, block) {
   const key = `${day}-${block}`;
   const circuit = CIRCUITS[key];
   if (!circuit) { alert('Circuit coming soon for: ' + key); return; }
-  cState = {circuit,exIdx:0,round:1,totalRounds:circuit.rounds,phase:'exercise',timer:null,showingNotes:false};
+  cState = {circuit,exIdx:0,round:1,totalRounds:circuit.rounds,phase:'exercise',timer:null,exTimer:null,showingNotes:false};
+  circuitLogBuffer = {};
   document.getElementById('c-day-label').textContent = circuit.day;
   document.getElementById('c-block-name').textContent = circuit.name;
   document.getElementById('c-rounds-total').textContent = circuit.rounds;
@@ -1899,6 +1994,7 @@ function startCircuit(day, block) {
 }
 
 function renderCircuitExercise() {
+  clearExTimer();
   const {circuit,exIdx,round,totalRounds} = cState;
   const ex = circuit.exercises[exIdx];
   const total = circuit.exercises.length;
@@ -1929,6 +2025,49 @@ function renderCircuitExercise() {
     const toggleBtn = document.getElementById('c-notes-toggle');
     if (toggleBtn) toggleBtn.textContent = 'Form Notes ↓';
   }
+  // Exercise timer (for timed exercises)
+  const timerDiv = document.getElementById('c-ex-timer');
+  if (ex.timedSecs) {
+    timerDiv.style.display = 'flex';
+    document.getElementById('c-ex-timer-num').textContent = ex.timedSecs;
+    document.getElementById('c-ex-timer-side').textContent = 'tap to start';
+    document.getElementById('c-ex-timer-btn').textContent = 'Start Timer';
+    document.getElementById('c-ex-timer-circle').style.strokeDashoffset = '200';
+    cState._timedTotal = ex.timedSecs;
+    cState._timedRunning = false;
+  } else {
+    timerDiv.style.display = 'none';
+  }
+  // Log inputs
+  const logLabel = document.getElementById('c-log-label');
+  const logInputs = document.getElementById('c-log-inputs');
+  const logArea = document.getElementById('c-log-area');
+  const isWarmup = circuit.isWarmup;
+  if (isWarmup || ex.timedSecs) {
+    // For warmup or timed — show single notes field
+    logArea.style.display = isWarmup ? 'none' : '';
+    if (!isWarmup) {
+      logLabel.textContent = 'Notes';
+      logInputs.style.gridTemplateColumns = '1fr';
+      logInputs.innerHTML = `<input class="circuit-log-input" id="c-log-s1" type="text" placeholder="e.g. 30s each side">`;
+      logInputs.style.gridTemplateColumns = '1fr';
+    }
+  } else {
+    logArea.style.display = '';
+    logLabel.textContent = `Log ${round === totalRounds ? 'Final Set' : 'Set ' + round}`;
+    logInputs.style.gridTemplateColumns = '1fr 1fr 1fr';
+    // Restore saved values if any
+    const saved = circuitLogBuffer[ex.name] || {};
+    logInputs.innerHTML = `
+      <input class="circuit-log-input" id="c-log-s1" type="text" placeholder="Set 1" value="${saved.s1||''}">
+      <input class="circuit-log-input" id="c-log-s2" type="text" placeholder="Set 2" value="${saved.s2||''}">
+      <input class="circuit-log-input" id="c-log-s3" type="text" placeholder="Set 3" value="${saved.s3||''}">`;
+    if (aiRecStr) {
+      document.getElementById('c-log-s1').placeholder = aiRecStr;
+      document.getElementById('c-log-s2').placeholder = aiRecStr;
+      document.getElementById('c-log-s3').placeholder = aiRecStr;
+    }
+  }
   // Image
   const img = document.getElementById('c-img');
   const ph = document.getElementById('c-img-ph');
@@ -1957,7 +2096,26 @@ function showView(view) {
 }
 
 function circuitNext() {
+  // Save log inputs for current exercise
+  const ex = cState.circuit && cState.circuit.exercises[cState.exIdx];
+  if (ex && !cState.circuit.isWarmup) {
+    const s1 = document.getElementById('c-log-s1')?.value || '';
+    const s2 = document.getElementById('c-log-s2')?.value || '';
+    const s3 = document.getElementById('c-log-s3')?.value || '';
+    if (s1 || s2 || s3) {
+      if (!circuitLogBuffer[ex.name]) circuitLogBuffer[ex.name] = {s1:'',s2:'',s3:''};
+      // Merge: fill whichever sets are missing
+      if (s1 && !circuitLogBuffer[ex.name].s1) circuitLogBuffer[ex.name].s1 = s1;
+      if (s2 && !circuitLogBuffer[ex.name].s2) circuitLogBuffer[ex.name].s2 = s2;
+      if (s3 && !circuitLogBuffer[ex.name].s3) circuitLogBuffer[ex.name].s3 = s3;
+      // Always update with latest non-empty value
+      if (s1) circuitLogBuffer[ex.name].s1 = s1;
+      if (s2) circuitLogBuffer[ex.name].s2 = s2;
+      if (s3) circuitLogBuffer[ex.name].s3 = s3;
+    }
+  }
   clearRestTimer();
+  clearExTimer();
   const {circuit,exIdx,round,totalRounds} = cState;
   const total = circuit.exercises.length;
   if (exIdx + 1 < total) {
@@ -1969,6 +2127,7 @@ function circuitNext() {
     startRest();
   } else {
     showComplete();
+    applyCircuitLogToForm();
   }
 }
 
@@ -1987,6 +2146,70 @@ function startRest() {
 function clearRestTimer() {
   if (cState.timer) { clearInterval(cState.timer); cState.timer = null; }
 }
+
+function startExTimer() {
+  if (cState._timedRunning) return;
+  cState._timedRunning = true;
+  let secs = cState._timedTotal;
+  const circumference = 200;
+  const numEl = document.getElementById('c-ex-timer-num');
+  const circleEl = document.getElementById('c-ex-timer-circle');
+  const sideEl = document.getElementById('c-ex-timer-side');
+  const btnEl = document.getElementById('c-ex-timer-btn');
+  if (btnEl) btnEl.textContent = 'Running…';
+  cState.exTimer = setInterval(() => {
+    secs--;
+    if (numEl) numEl.textContent = Math.max(secs, 0);
+    if (circleEl) circleEl.style.strokeDashoffset = (circumference - (circumference * (cState._timedTotal - secs) / cState._timedTotal)).toFixed(1);
+    if (secs <= 0) {
+      clearExTimer();
+      if (sideEl) sideEl.textContent = 'done ✓';
+      if (btnEl) { btnEl.textContent = 'Reset'; btnEl.onclick = resetExTimer; }
+    }
+  }, 1000);
+  if (sideEl) sideEl.textContent = 'running…';
+}
+
+function resetExTimer() {
+  clearExTimer();
+  cState._timedRunning = false;
+  const ex = cState.circuit && cState.circuit.exercises[cState.exIdx];
+  if (!ex) return;
+  const numEl = document.getElementById('c-ex-timer-num');
+  const circleEl = document.getElementById('c-ex-timer-circle');
+  const sideEl = document.getElementById('c-ex-timer-side');
+  const btnEl = document.getElementById('c-ex-timer-btn');
+  if (numEl) numEl.textContent = ex.timedSecs;
+  if (circleEl) circleEl.style.strokeDashoffset = '200';
+  if (sideEl) sideEl.textContent = 'tap to start';
+  if (btnEl) { btnEl.textContent = 'Start Timer'; btnEl.onclick = startExTimer; }
+}
+
+function clearExTimer() {
+  if (cState.exTimer) { clearInterval(cState.exTimer); cState.exTimer = null; }
+  cState._timedRunning = false;
+}
+
+function applyCircuitLogToForm() {
+  // Populate the log form tab with data collected during circuit
+  if (!Object.keys(circuitLogBuffer).length) return;
+  try {
+    // Switch to log tab context — pre-fill exercise rows if they exist
+    Object.entries(circuitLogBuffer).forEach(([exName, data]) => {
+      const row = document.querySelector(`.f-set-row[data-ex="${exName}"]`);
+      if (!row) return;
+      const s1 = row.querySelector('.f-s1');
+      const s2 = row.querySelector('.f-s2');
+      const s3 = row.querySelector('.f-s3');
+      if (s1 && data.s1) s1.value = data.s1;
+      if (s2 && data.s2) s2.value = data.s2;
+      if (s3 && data.s3) s3.value = data.s3;
+    });
+  } catch(e) {}
+  // Store buffer in sessionStorage so it survives a tab switch
+  try { sessionStorage.setItem('eq_circuit_log', JSON.stringify(circuitLogBuffer)); } catch(e) {}
+}
+
 
 function showComplete() {
   clearRestTimer();
@@ -2012,7 +2235,13 @@ document.getElementById('circuit-overlay').addEventListener('touchend', e => {
 // ── RIDING LOG ──
 const SK_RIDES = 'eq_rides_v1';
 const SK_FOCUS = 'eq_ride_focus_v1';
-let rideLogs = [];
+let rideLogs = [
+  {date:'2026-05-18',type:'Solo ride',horse:'Candide',instructor:'',worked:'Stretching/improving trot',good:'Baby steps on turns on the haunches',improve:'Still sluggish',feedback:'',body:'',feel:'ok',calories:279,duration:47,distance:1.8},
+  {date:'2026-05-17',type:'Trail / hack',horse:'Candide',instructor:'',worked:'Relaxation, uphill gallops — hind end and cardio building',good:'Strong collected hand gallops without running away',improve:'Struggled on downhill walks, a little squirrelly coming off the trailer',feedback:'',body:'Right ankle weak',feel:'great',calories:498,duration:120,distance:5.5},
+  {date:'2026-05-16',type:'Flat — dressage/eq focus',horse:'Candide',instructor:'Marty',worked:'Improving the trot, canter coming from hind end',good:'Trot improved immensely with turns on the haunches, canter work was good towards end of lesson',improve:'Sluggish, lots of head shenanigans, really had to push into the canter',feedback:'Really bend body, and use upper body to push turns, also keep shoulders back in canter.',body:'',feel:'tough',calories:460,duration:90,distance:null},
+  {date:'2026-05-15',type:'Jump lesson',horse:'Candide',instructor:'Chris',worked:"Trotting into vertical with a rail 8 feet out, ask but don't ask for canter 8 feet (1 stride) from rail",good:"One really great round over 2'9\"",improve:'Still struggling to keep eyes up, maintain connection into jump, that\'s why we had a double refusal',feedback:'Eyes up, let go of inside elbow, maintain connection into the jump',body:'Ankles pretty painful and rolled out toward end of lesson, felt like they\'d lost stability over a bigger fence',feel:'good',calories:391,duration:85,distance:3.2},
+  {date:'2026-05-12',type:'Solo ride',horse:'Candide',instructor:'',worked:'Circles',good:'Forward moving',improve:'Sloppy canter',feedback:'',body:'Right ankle wobbly',feel:'tough',calories:258,duration:45,distance:2.5}
+];
 
 function saveRideFocus() {
   const focus = {
